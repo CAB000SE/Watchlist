@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Watchlist</string>
+    <string name="title_activity_custom_list_adapter">CustomListAdapter</string>
+</resources>
