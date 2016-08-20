@@ -72,10 +72,10 @@ public class AddPage extends AppCompatActivity {
 
     }
 
+    //used for finding the selected radiobutton
     public void addListenerOnButton() {
 
         radioGroupMain = (RadioGroup) findViewById(R.id.radioGroup);
-
 
         // get selected radio button from radioGroup
         int selectedId = radioGroupMain.getCheckedRadioButtonId();
@@ -85,7 +85,7 @@ public class AddPage extends AppCompatActivity {
 
     }
 
-
+    //can be invoked for a simple Alert Dialog easily with a title and a message
     public void showMessage(String title, String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(true);
@@ -94,12 +94,32 @@ public class AddPage extends AppCompatActivity {
         builder.show();
     }
 
+    //simple intents to go to other classes on a button click (next 4 classes)
     public void gotoAdd(View view) {
         Intent i = new Intent(view.getContext(), AddPage.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(i);
     }
 
+    public void gotoModify(View view) {
+        Intent i = new Intent(view.getContext(), ModifyPage.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(i);
+    }
+
+    public void gotoUpcoming(View view) {
+        Intent i = new Intent(view.getContext(), UpcomingPage.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(i);
+    }
+
+    public void gotoSettings(View view) {
+        Intent i = new Intent(view.getContext(), SettingsPage.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(i);
+    }
+
+    //used to pop up a time picker dialog
     public void timePick(View view) {
 
 
@@ -122,6 +142,7 @@ public class AddPage extends AppCompatActivity {
 
     }
 
+    //used to pop up a date picker dialog
     public void datePick(View view) {
 
         //finds the current date to make more user friendly
@@ -140,25 +161,6 @@ public class AddPage extends AppCompatActivity {
         mDatePicker.show();
     }
 
-    public void gotoModify(View view) {
-        Intent i = new Intent(view.getContext(), ModifyPage.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(i);
-    }
-
-    public void gotoUpcoming(View view) {
-        Intent i = new Intent(view.getContext(), UpcomingPage.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(i);
-    }
-
-    public void gotoSettings(View view) {
-        Intent i = new Intent(view.getContext(), SettingsPage.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(i);
-    }
-
-
     //the scheduling of the notification
     private void scheduleNotification(Notification notification, long delay) {
 
@@ -171,6 +173,7 @@ public class AddPage extends AppCompatActivity {
 
             Random generator = new Random(); //generates a random number
             notificationID = generator.nextInt(100000000);
+            //TODO: keep track of above variable to allow notification to be overwritten in ModifyPage
 
             //creates the pending intent to delay the notification, stores the unique id (a - random int), the notification Intent, and itself
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -244,12 +247,13 @@ public class AddPage extends AppCompatActivity {
         long longTimeUntil = date.getTime();
         long lngTimeUntilAir = longTimeUntil - lngCurrentTime;
 
+        //gets the current date to test below if
         Calendar cal = Calendar.getInstance();
         Date currentDate = cal.getTime();
 
-        if(currentDate.after(date)){
+        if(currentDate.after(date)){ //test to ensure only future dates can be selected
             showMessage("Error", "Please select a future date for scheduling TV Listings");
-        }else{
+        }else{ //if it isnt a future date...
 
 
 
@@ -268,6 +272,7 @@ public class AddPage extends AppCompatActivity {
             Date temp = date2;
             buffer2.append(" ");
 
+            //used for finding the future air dates for the listings BY DAY
             for(int fg=0;fg < (intTotalEpisodes + 1);fg++) {
 
                 String newstring = new SimpleDateFormat("dd/MM/yy HH:mm").format(temp);
@@ -300,6 +305,7 @@ public class AddPage extends AppCompatActivity {
             Date date2 = sdf.parse(mm);
             Date temp = date2;
 
+            //used for finding the future air dates for the listings BY WEEK
             for(int fg=0;fg < (intTotalEpisodes + 1);fg++) {
 
                 String newstring = new SimpleDateFormat("dd/MM/yy HH:mm").format(temp);
