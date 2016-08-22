@@ -67,6 +67,7 @@ public class ModifyPage extends AppCompatActivity {
     Button displayID;
     EditText IDenter;
 
+    TextView textAirFreq;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +86,8 @@ public class ModifyPage extends AppCompatActivity {
         IDenter = (EditText) findViewById(R.id.editText7);
         saveListing = (Button) findViewById(R.id.button3);
         deleteListing = (Button) findViewById(R.id.button6);
+        textAirFreq = (TextView) findViewById(R.id.editText5);
+
 
 
         db = openOrCreateDatabase("newTVDB", Context.MODE_PRIVATE, null);
@@ -146,6 +149,7 @@ public class ModifyPage extends AppCompatActivity {
         editAirDate.setVisibility(View.VISIBLE);
         radioGroupMain.setVisibility(View.VISIBLE);
         saveListing.setVisibility(View.VISIBLE);
+        textAirFreq.setVisibility(View.VISIBLE);
 
         viewAll.setVisibility(View.INVISIBLE);
         displayID.setVisibility(View.INVISIBLE);

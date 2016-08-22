@@ -75,10 +75,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/editText"
         android:hint="Name"
-        android:layout_marginTop="55dp"
+        android:layout_marginTop="39dp"
         android:layout_below="@+id/button"
-        android:layout_alignEnd="@+id/editText2"
-        android:layout_alignStart="@+id/editText2" />
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/editText2" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -88,7 +88,7 @@
         android:id="@+id/editText2"
         android:hint="Season Number"
         android:layout_below="@+id/editText"
-        android:layout_alignEnd="@+id/editText3" />
+        android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -98,7 +98,7 @@
         android:id="@+id/editText3"
         android:hint="Episodes Remaining"
         android:layout_below="@+id/editText2"
-        android:layout_alignEnd="@+id/editText4" />
+        android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -108,7 +108,7 @@
         android:id="@+id/editText4"
         android:hint="Current Episode"
         android:layout_below="@+id/editText3"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -119,9 +119,8 @@
         android:hint="Air Time"
         android:onClick="timePick"
         android:focusable="false"
-        android:layout_below="@+id/editText4"
-        android:layout_alignStart="@+id/editText4"
-        android:layout_toStartOf="@+id/button2" />
+        android:layout_below="@+id/editText6"
+        android:layout_alignEnd="@+id/editText6" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -134,15 +133,15 @@
         android:focusable="false"
         android:layout_below="@+id/editText4"
         android:layout_alignEnd="@+id/editText4"
-        android:layout_alignStart="@+id/button2" />
+        android:layout_alignParentStart="true" />
 
     <RadioGroup
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/radioGroup"
-        android:layout_marginTop="77dp"
-        android:layout_below="@+id/editText5"
-        android:layout_alignStart="@+id/editText5">
+        android:layout_above="@+id/button3"
+        android:layout_below="@+id/textView"
+        android:layout_alignEnd="@+id/textView">
 
         <RadioButton
             android:layout_width="128dp"
@@ -170,11 +169,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
+        android:text="Air Frequency:"
         android:id="@+id/textView"
-        android:layout_marginTop="51dp"
         android:layout_below="@+id/editText5"
-        android:layout_toEndOf="@+id/button" />
+        android:layout_alignParentStart="true"
+        android:textSize="20dp" />
 
 
 </RelativeLayout>
