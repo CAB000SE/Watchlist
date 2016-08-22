@@ -1,6 +1,5 @@
 package com.example.jorda.watchlist;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.Notification;
@@ -15,17 +14,12 @@ import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TimePicker;
-import android.widget.Toast;
-
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -49,6 +43,8 @@ public class AddPage extends AppCompatActivity {
     private RadioGroup radioGroupMain;
     private RadioButton radioSelected;
     public static int notificationID;
+    int intNotificationIDprefix = 0;
+
 
 
     //TODO: Fix the current episode / total episodes fluff
@@ -174,7 +170,8 @@ public class AddPage extends AppCompatActivity {
             notificationIntent.putExtra(Receiver.NOTIFICATION, notification); //puts the actual notification
 
             Random generator = new Random(); //generates a random number
-            notificationID = generator.nextInt(100000000);
+            notificationID = intNotificationIDprefix;
+            System.out.println(notificationID);
             //TODO: keep track of above variable to allow notification to be overwritten in ModifyPage
 
             //creates the pending intent to delay the notification, stores the unique id (a - random int), the notification Intent, and itself
@@ -252,6 +249,8 @@ public class AddPage extends AppCompatActivity {
         //gets the current date to test below if
         Calendar cal = Calendar.getInstance();
         Date currentDate = cal.getTime();
+        String strNotificationIDprefix;
+
 
         if(currentDate.after(date)){ //test to ensure only future dates can be selected
             showMessage("Error", "Please select a future date for scheduling TV Listings");
@@ -263,7 +262,10 @@ public class AddPage extends AppCompatActivity {
         if (radioSelected.getText().equals("Daily")) {
 
             int f;
-            for (f = 0; f < intTotalEpisodes; f++) { //invokes scheduleNotification the correct amount of episodes, multiplying the current episode by 24 hours (86400000 in millis) to schedule the correct number of notifications through the alarmmanager
+            for (f = 0; f < (intTotalEpisodes + 1); f++) { //invokes scheduleNotification the correct amount of episodes, multiplying the current episode by 24 hours (86400000 in millis) to schedule the correct number of notifications through the alarmmanager
+                strNotificationIDprefix = "" + id + "00";
+                intNotificationIDprefix = Integer.parseInt(strNotificationIDprefix);
+                intNotificationIDprefix = intNotificationIDprefix + f;
                 scheduleNotification(getNotification(editName.getText().toString()), (lngTimeUntilAir + (86400000 * f)));
                 System.out.println("TIME UNTIL THE NOTIFICATION FOR DAY " + f + " : " + (lngTimeUntilAir + (86400000 * f)));
             }
@@ -294,11 +296,23 @@ public class AddPage extends AppCompatActivity {
             meme = buffer2.toString();
             System.out.println(meme);
         }
+
+            long lngFinalAirTime;
+            long lngBigMillis;
+
         if (radioSelected.getText().equals("Weekly")) { //does same for above but for a week instead of day
             int f;
-            for (f = 0; f < intTotalEpisodes; f++) {
-                scheduleNotification(getNotification(editName.getText().toString()), (lngTimeUntilAir + (604800000 * f)));
-                System.out.println("TIME UNTIL THE NOTIFICATION FOR WEEK ONE" + (lngTimeUntilAir + (604800000 * f)));
+            for (f = 0; f < (intTotalEpisodes + 1); f++) {
+                strNotificationIDprefix = "" + id + "00";
+                intNotificationIDprefix = Integer.parseInt(strNotificationIDprefix);
+                intNotificationIDprefix = intNotificationIDprefix + f;
+                lngFinalAirTime = lngTimeUntilAir;
+                lngBigMillis = Long.valueOf(86400000 * f);
+                System.out.println(lngBigMillis);
+                lngFinalAirTime = lngFinalAirTime + lngBigMillis;
+                scheduleNotification(getNotification(editName.getText().toString()), lngFinalAirTime);
+                System.out.println("TIME UNTIL THE NOTIFICATION FOR WEEK " + f + " : " +  (lngFinalAirTime));
+                System.out.println(f);
             }
 
             StringBuffer buffer2 = new StringBuffer();
@@ -306,6 +320,8 @@ public class AddPage extends AppCompatActivity {
 
             Date date2 = sdf.parse(mm);
             Date temp = date2;
+            buffer2.append(" ");
+
 
             //used for finding the future air dates for the listings BY WEEK
             for(int fg=0;fg < (intTotalEpisodes + 1);fg++) {

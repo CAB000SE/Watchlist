@@ -96,7 +96,7 @@
         android:inputType="number"
         android:ems="10"
         android:id="@+id/editText3"
-        android:hint="Episodes Remaining"
+        android:hint="Episodes in Season"
         android:layout_below="@+id/editText2"
         android:layout_alignParentStart="true" />
 
