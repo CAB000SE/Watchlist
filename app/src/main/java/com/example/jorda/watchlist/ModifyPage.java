@@ -140,7 +140,6 @@ public class ModifyPage extends AppCompatActivity {
 
         }
 
-
         editName.setVisibility(View.VISIBLE);
         editSeason.setVisibility(View.VISIBLE);
         editNumberEpisodes.setVisibility(View.VISIBLE);
