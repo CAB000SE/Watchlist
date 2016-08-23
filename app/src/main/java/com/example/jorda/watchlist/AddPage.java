@@ -172,7 +172,6 @@ public class AddPage extends AppCompatActivity {
             Random generator = new Random(); //generates a random number
             notificationID = intNotificationIDprefix;
             System.out.println(notificationID);
-            //TODO: keep track of above variable to allow notification to be overwritten in ModifyPage
 
             //creates the pending intent to delay the notification, stores the unique id (a - random int), the notification Intent, and itself
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);

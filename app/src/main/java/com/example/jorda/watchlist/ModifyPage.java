@@ -52,14 +52,15 @@ public class ModifyPage extends AppCompatActivity {
     Button saveListing;
     Button deleteListing;
 
-    public static int notificationID;
-
 
     static int id;
 
     int mYear;
     int mMonth;
     int mDay;
+
+    public static int notificationID;
+    int intNotificationIDprefix = 0;
 
 
     //default stuff
@@ -288,8 +289,8 @@ public class ModifyPage extends AppCompatActivity {
         notificationIntent.putExtra(Receiver.NOTIFICATION, notification); //puts the actual notification
 
         Random generator = new Random(); //generates a random number
-        notificationID = generator.nextInt(100000000);
-        //TODO: generate the correct notificationID variables
+        notificationID = intNotificationIDprefix;
+        System.out.println(notificationID);
 
         //creates the pending intent to delay the notification, stores the unique id (a - random int), the notification Intent, and itself
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -340,6 +341,8 @@ public class ModifyPage extends AppCompatActivity {
 
         Calendar cal = Calendar.getInstance();
         Date currentDate = cal.getTime();
+        String strNotificationIDprefix;
+
 
         if(currentDate.after(date)){
             showMessage("Error", "Please select a future date for scheduling TV Listings");
@@ -350,7 +353,10 @@ public class ModifyPage extends AppCompatActivity {
             if (radioSelected.getText().equals("Daily")) {
 
                 int f;
-                for (f = 0; f < intTotalEpisodes; f++) {
+                for (f = 0; f < (intTotalEpisodes + 1); f++) {
+                    strNotificationIDprefix = "" + id + "00";
+                    intNotificationIDprefix = Integer.parseInt(strNotificationIDprefix);
+                    intNotificationIDprefix = intNotificationIDprefix + f;
                     scheduleNotification(getNotification(editName.getText().toString()), (lngTimeUntilAir + (86400000 * f)));
                     System.out.println("TIME UNTIL THE NOTIFICATION FOR DAY " + f + " : " + (lngTimeUntilAir + (86400000 * f)));
                 }
@@ -383,12 +389,22 @@ public class ModifyPage extends AppCompatActivity {
                 System.out.println(meme);
             }
 
+            long lngFinalAirTime;
+            long lngBigMillis;
 
             if (radioSelected.getText().equals("Weekly")) {
                 int f;
-                for (f = 0; f < intTotalEpisodes; f++) {
-                    scheduleNotification(getNotification(editName.getText().toString()), (lngTimeUntilAir + (604800000 * f)));
-                    System.out.println("TIME UNTIL THE NOTIFICATION FOR WEEK ONE" + (lngTimeUntilAir + (604800000 * f)));
+                for (f = 0; f < (intTotalEpisodes + 1); f++) {
+                    strNotificationIDprefix = "" + id + "00";
+                    intNotificationIDprefix = Integer.parseInt(strNotificationIDprefix);
+                    intNotificationIDprefix = intNotificationIDprefix + f;
+                    lngFinalAirTime = lngTimeUntilAir;
+                    lngBigMillis = Long.valueOf(86400000 * f);
+                    System.out.println(lngBigMillis);
+                    lngFinalAirTime = lngFinalAirTime + lngBigMillis;
+                    scheduleNotification(getNotification(editName.getText().toString()), lngFinalAirTime);
+                    System.out.println("TIME UNTIL THE NOTIFICATION FOR WEEK " + f + " : " +  (lngFinalAirTime));
+                    System.out.println(f);
                 }
 
                 StringBuffer buffer2 = new StringBuffer();
@@ -418,15 +434,6 @@ public class ModifyPage extends AppCompatActivity {
 
             }
 
-            if (radioSelected.getText().equals("Monthly")) {
-                int f;
-                long a = 2592000000L;
-
-                for (f = 0; f < intTotalEpisodes; f++) {
-                    scheduleNotification(getNotification(editName.getText().toString()), (lngTimeUntilAir + (a * f)));
-                    System.out.println("TIME UNTIL THE NOTIFICATION FOR WEEK ONE" + (lngTimeUntilAir + (a * f)));
-                }
-            }
 
             Cursor c = db.rawQuery("SELECT * FROM Shows WHERE id='" + IDenter.getText() + "'", null);
             if (c.moveToFirst()) {

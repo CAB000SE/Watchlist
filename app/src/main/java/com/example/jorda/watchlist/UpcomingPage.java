@@ -209,13 +209,8 @@ public class UpcomingPage extends AppCompatActivity {
                     File f=new File("/storage/emulated/0/Watchlist_images/" + fileName + ".jpg");
                     System.out.println("/storage/emulated/0/Watchlist_images/" + fileName + ".jpg");
 
-                   // Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
-
                     //inflates the custom-made listview layout to this view
                     View view = LayoutInflater.from(getApplication()).inflate(R.layout.mylist, null, true);
-
-                    //TODO: determine this variables worth
-                   // Drawable d = new BitmapDrawable(getResources(), b);
 
                     //adds the file to the secondary String array. decoded in the custom list adapter, not here
                     bl.add(f);
