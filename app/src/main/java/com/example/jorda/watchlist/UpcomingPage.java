@@ -150,7 +150,7 @@ public class UpcomingPage extends AppCompatActivity {
             buffer.append("Name: " + c.getString(1) + "\n");
             //these 2 lines allow for a more tradition "season" x "episode" look
             buffer.append("Episode: " + c.getString(2));
-            buffer.append("x" + intCurrentEpisode + "\n");
+            buffer.append("x" + c.getString(4) + "\n");
 
             //handles a complete season
             if(mm.equals("01/01/16 01:01")){

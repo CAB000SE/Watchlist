@@ -46,9 +46,6 @@ public class AddPage extends AppCompatActivity {
     int intNotificationIDprefix = 0;
 
 
-
-    //TODO: Fix the current episode / total episodes fluff
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
