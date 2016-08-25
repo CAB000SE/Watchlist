@@ -2,23 +2,43 @@ package com.example.jorda.watchlist;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 public class SettingsPage extends AppCompatActivity {
 
     SQLiteDatabase db2;
+    private RadioGroup radioGroupMain;
+    private RadioButton radioSelected;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        SharedPreferences pref = this.getSharedPreferences("Share", Context.MODE_PRIVATE);
+        int orderFashion = pref.getInt("your key1", 0); //1 is default value.
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_page);
 
         db2 = openOrCreateDatabase("newTVDB", Context.MODE_PRIVATE, null);
+
+        addListenerOnButton();
+
+        if(orderFashion==2){
+            radioGroupMain.check(R.id.orderName);
+        }else{
+            radioGroupMain.check(R.id.orderID);
+        }
 
 
     }
@@ -27,42 +47,61 @@ public class SettingsPage extends AppCompatActivity {
         db2.execSQL("DELETE FROM Shows");
     }
 
-    public void orderAll(){
-        Cursor c = db2.rawQuery("SELECT * FROM Shows ORDER BY name", null);
-        StringBuffer buffer = new StringBuffer();
-        while (c.moveToNext()) {
-
-
-            db2.execSQL("INSERT INTO Shows VALUES('"
-                    + c.getString(0)
-                    + "','" +
-                    c.getString(1)
-                    + "','" +
-                    c.getString(2)
-                    + "','" +
-                    c.getString(3)
-                    + "','" +
-                    c.getString(4)
-                    + "','" +
-                    c.getString(5)
-                    + "','" +
-                    c.getString(6)
-                    + "','" +
-                    c.getString(7)
-                    + "');");
-
-
-
-            buffer.append("ID: " + c.getString(0)+"\n");
-            buffer.append("Name: "+c.getString(1)+"\n");
-            buffer.append("Season Number: "+c.getString(2)+"\n");
-            buffer.append("Number of Episodes: "+c.getString(3)+"\n");
-            buffer.append("Current Episodes: "+c.getString(4)+"\n");
-            buffer.append("Air Time: "+c.getString(5)+"\n");
-            buffer.append("Air Date: "+c.getString(6)+"\n");
-            buffer.append("Air Freq: "+c.getString(7)+"\n\n");
-        }  showMessage("TV Listings", buffer.toString());
+    public void reset(View view) {
+        addListenerOnButton();
     }
+    //used for finding the selected radiobutton
+    public void addListenerOnButton() {
+
+        radioGroupMain = (RadioGroup) findViewById(R.id.radioGroup1);
+
+        // get selected radio button from radioGroup
+        int selectedId = radioGroupMain.getCheckedRadioButtonId();
+
+        // find the radiobutton by returned id
+        radioSelected = (RadioButton) findViewById(selectedId);
+
+        if(radioSelected.getText().equals("Order By ID")){
+            orderID();
+        }
+
+        if(radioSelected.getText().equals("Order By Name")){
+            orderName();
+        }
+
+
+    }
+
+    public void orderName(){
+
+        SharedPreferences pref = this.getSharedPreferences("Share", Context.MODE_PRIVATE);
+        int orderFashion;
+
+        orderFashion = 2;
+
+        SharedPreferences.Editor edit = pref.edit();
+        edit.putInt("your key1", orderFashion);
+        edit.commit();
+
+        System.out.println("yes im here");
+
+    }
+
+    public void orderID(){
+
+        SharedPreferences pref = this.getSharedPreferences("Share", Context.MODE_PRIVATE);
+        int orderFashion;
+
+        orderFashion = 3;
+
+        SharedPreferences.Editor edit = pref.edit();
+        edit.putInt("your key1", orderFashion);
+        edit.commit();
+
+        System.out.println("yes im again");
+
+    }
+
 
     public void showMessage(String title,String message) {
         AlertDialog.Builder builder=new AlertDialog.Builder(this);

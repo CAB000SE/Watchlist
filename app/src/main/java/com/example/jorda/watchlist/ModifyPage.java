@@ -9,6 +9,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -68,6 +69,7 @@ public class ModifyPage extends AppCompatActivity {
 
     public static int notificationID;
     int intNotificationIDprefix = 0;
+    Cursor c;
 
 
 
@@ -129,7 +131,16 @@ public class ModifyPage extends AppCompatActivity {
 
     public void displayList(){
 
-        Cursor c=db.rawQuery("SELECT * FROM Shows", null);
+        SharedPreferences pref = this.getSharedPreferences("Share", Context.MODE_PRIVATE);
+        int orderFashion = pref.getInt("your key1", 0); //1 is default value.
+        System.out.println(orderFashion);
+        if(orderFashion==2){
+            c = db.rawQuery("SELECT * FROM Shows ORDER BY name COLLATE NOCASE;", null);
+        } else{
+            c=db.rawQuery("SELECT * FROM Shows", null);
+        }
+
+
         if(c.getCount()==0)
         {
             showMessage("Error", "No Listings Found");

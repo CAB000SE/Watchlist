@@ -67,18 +67,41 @@
         android:layout_height="wrap_content"
         android:text="DELETE ALL LISTINGS"
         android:id="@+id/button4"
+        android:layout_marginTop="52dp"
+        android:onClick="deleteAll"
         android:layout_below="@+id/button1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="115dp"
-        android:onClick="deleteAll"/>
+        android:layout_centerHorizontal="true" />
 
-    <Switch
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/radioGroup1"
+        android:checkedButton="@+id/option1"
+        android:layout_marginTop="110dp"
+        android:layout_below="@+id/button4"
+        android:layout_alignStart="@+id/button4"
+        android:layout_alignEnd="@+id/button4">
+
+    <RadioButton
+        android:layout_width="128dp"
+        android:layout_height="wrap_content"
+        android:text="Order By ID"
+        android:layout_below="@+id/option1b"
+        android:layout_alignStart="@+id/option1b"
+        android:checked="true"
+        android:id="@+id/orderID"
+        android:onClick="reset"/>
+
+    <RadioButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Order Listings By Name:"
-        android:id="@+id/switch1"
+        android:id="@+id/orderName"
+        android:text="Order By Name"
         android:checked="false"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_below="@+id/option1a"
+        android:layout_alignRight="@+id/imageView"
+        android:onClick="reset"/>
+
+    </RadioGroup>
 
 </RelativeLayout>

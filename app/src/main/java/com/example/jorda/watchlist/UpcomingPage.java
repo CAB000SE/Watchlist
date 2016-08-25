@@ -4,6 +4,7 @@ package com.example.jorda.watchlist;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -51,6 +52,7 @@ public class UpcomingPage extends AppCompatActivity {
     String fileName = "";
     private Handler mHandler = new Handler();
     int intEpisodesRemaining;
+    Cursor c;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -77,7 +79,16 @@ public class UpcomingPage extends AppCompatActivity {
 
     public void display(){
 
-        Cursor c = db2.rawQuery("SELECT * FROM Shows", null);
+        SharedPreferences pref = this.getSharedPreferences("Share", Context.MODE_PRIVATE);
+        int orderFashion = pref.getInt("your key1", 0); //1 is default value.
+        System.out.println(orderFashion);
+        if(orderFashion==2){
+            c = db2.rawQuery("SELECT * FROM Shows ORDER BY name COLLATE NOCASE;", null);
+        } else{
+            c=db2.rawQuery("SELECT * FROM Shows", null);
+        }
+
+
 
         //buffers the SQL listing and invokes the showMessage void to display the listing details
         while (c.moveToNext()) {
