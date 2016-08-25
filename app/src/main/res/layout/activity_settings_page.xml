@@ -62,14 +62,23 @@
         android:background="#ffffff"
         android:onClick="gotoSettings"/>
 
-    <TextView
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="SETTINGS"
-        android:id="@+id/textView2"
-        android:layout_alignParentBottom="true"
-        android:layout_alignEnd="@+id/imageButton"
-        android:layout_marginBottom="144dp" />
+        android:text="DELETE ALL LISTINGS"
+        android:id="@+id/button4"
+        android:layout_below="@+id/button1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="115dp"
+        android:onClick="deleteAll"/>
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Order Listings By Name:"
+        android:id="@+id/switch1"
+        android:checked="false"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

@@ -197,7 +197,6 @@ public class UpcomingPage extends AppCompatActivity {
                     * null as the posters have not yet been downloaded. 1 second per poster should always be enough considering
                     * that the file is tiny, but may need to be adjusted / different method used for slower connections*/
                     try {
-                        //TODO: find better method
                         Thread.sleep(1000);
                     } catch(InterruptedException ex) {
                         Thread.currentThread().interrupt();
@@ -244,7 +243,6 @@ public class UpcomingPage extends AppCompatActivity {
                 String s = listView.getItemAtPosition(position).toString();
 
                 //used to get the name of the listing.
-                //TODO: why is the below code done the hard way?
                 s = s.substring(s.indexOf("Name: ") + 6);
                 s = s.substring(0, s.indexOf("Episode"));
 
