@@ -23,6 +23,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:padding="2dp"
+            android:textColor="#000000"
              />
        <!-- <TextView                                   FOR LATER, SET SO TITLE IS OTHER TEXTVIEW AND THIS IS REST OF INFO
             android:id="@+id/textView1"

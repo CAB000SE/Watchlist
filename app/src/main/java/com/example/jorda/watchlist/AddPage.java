@@ -213,183 +213,185 @@ public class AddPage extends AppCompatActivity {
         //finds the selected airfreq radio button
         addListenerOnButton();
 
-        //gets the current count variable stored within the application, which keeps the running id to keep each listing unique for the sqlite database
-        SharedPreferences pref = this.getSharedPreferences("Share", Context.MODE_PRIVATE);
-        int count = pref.getInt("your key", 0); //0 is default value.
-        count++;
-        //assigns the count to id, which is used throughout the class
-        id = count;
-        //puts the count variable back into the storage
-        SharedPreferences.Editor edit = pref.edit();
-        edit.putInt("your key", count);
-        edit.commit();
+        if (editName.getText().toString().equals("") || editSeason.getText().toString().equals("") || editNumberEpisodes.getText().toString().equals("") || editCurrentEpisode.getText().toString().equals("") || editAirTime.getText().toString().equals("") || editAirDate.getText().toString().equals("")) {
+            showMessage("Error", "Please ensure all fields are correctly filled out.");
+        } else {
 
-        //used to parse the time and the date, allowing them to be converted into milliseconds to be used with the alarmmanager class
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy hh:mm");
-        String mm = editAirDate.getText().toString() + " " + editAirTime.getText().toString();
-        System.out.println(mm);
-        Date date = sdf.parse(mm);
+            //gets the current count variable stored within the application, which keeps the running id to keep each listing unique for the sqlite database
+            SharedPreferences pref = this.getSharedPreferences("Share", Context.MODE_PRIVATE);
+            int count = pref.getInt("your key", 0); //0 is default value.
+            count++;
+            //assigns the count to id, which is used throughout the class
+            id = count;
+            //puts the count variable back into the storage
+            SharedPreferences.Editor edit = pref.edit();
+            edit.putInt("your key", count);
+            edit.commit();
 
-        //inits the current time
-        long lngCurrentTime = System.currentTimeMillis();
+            //used to parse the time and the date, allowing them to be converted into milliseconds to be used with the alarmmanager class
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy hh:mm");
+            String mm = editAirDate.getText().toString() + " " + editAirTime.getText().toString();
+            System.out.println(mm);
+            Date date = sdf.parse(mm);
 
-        String meme = "";
-        //finds the number of remaining episodes
-        int intTotalEpisodes = Integer.parseInt(editNumberEpisodes.getText().toString()) - Integer.parseInt(editCurrentEpisode.getText().toString());
-        System.out.println("INTTOTALEPISODES: " + intTotalEpisodes);
+            //inits the current time
+            long lngCurrentTime = System.currentTimeMillis();
 
-        //finds the time until the first airdate in milliseconds
-        long longTimeUntil = date.getTime();
-        long lngTimeUntilAir = longTimeUntil - lngCurrentTime;
+            String meme = "";
+            //finds the number of remaining episodes
+            int intTotalEpisodes = Integer.parseInt(editNumberEpisodes.getText().toString()) - Integer.parseInt(editCurrentEpisode.getText().toString());
+            System.out.println("INTTOTALEPISODES: " + intTotalEpisodes);
 
-        //gets the current date to test below if
-        Calendar cal = Calendar.getInstance();
-        Date currentDate = cal.getTime();
-        String strNotificationIDprefix;
+            //finds the time until the first airdate in milliseconds
+            long longTimeUntil = date.getTime();
+            long lngTimeUntilAir = longTimeUntil - lngCurrentTime;
 
-
-        if(currentDate.after(date)){ //test to ensure only future dates can be selected
-            showMessage("Error", "Please select a future date for scheduling TV Listings");
-        }else{ //if it isnt a future date...
-
+            //gets the current date to test below if
+            Calendar cal = Calendar.getInstance();
+            Date currentDate = cal.getTime();
+            String strNotificationIDprefix;
 
 
-        //uses the radio button to determine the air freq
-        if (radioSelected.getText().equals("Daily")) {
+            if (currentDate.after(date)) { //test to ensure only future dates can be selected
+                showMessage("Error", "Please select a future date for scheduling TV Listings");
+            } else { //if it isnt a future date...
 
-            int f;
-            for (f = 0; f < (intTotalEpisodes + 1); f++) { //invokes scheduleNotification the correct amount of episodes, multiplying the current episode by 24 hours (86400000 in millis) to schedule the correct number of notifications through the alarmmanager
-                strNotificationIDprefix = "" + id + "00";
-                intNotificationIDprefix = Integer.parseInt(strNotificationIDprefix);
-                intNotificationIDprefix = intNotificationIDprefix + f;
-                scheduleNotification(getNotification(editName.getText().toString()), (lngTimeUntilAir + (86400000 * f)));
-                System.out.println("TIME UNTIL THE NOTIFICATION FOR DAY " + f + " : " + (lngTimeUntilAir + (86400000 * f)));
+
+                //uses the radio button to determine the air freq
+                if (radioSelected.getText().equals("Daily")) {
+
+                    int f;
+                    for (f = 0; f < (intTotalEpisodes + 1); f++) { //invokes scheduleNotification the correct amount of episodes, multiplying the current episode by 24 hours (86400000 in millis) to schedule the correct number of notifications through the alarmmanager
+                        strNotificationIDprefix = "" + id + "00";
+                        intNotificationIDprefix = Integer.parseInt(strNotificationIDprefix);
+                        intNotificationIDprefix = intNotificationIDprefix + f;
+                        scheduleNotification(getNotification(editName.getText().toString()), (lngTimeUntilAir + (86400000 * f)));
+                        System.out.println("TIME UNTIL THE NOTIFICATION FOR DAY " + f + " : " + (lngTimeUntilAir + (86400000 * f)));
+                    }
+                    StringBuffer buffer2 = new StringBuffer();
+
+
+                    Date date2 = sdf.parse(mm);
+                    Date temp = date2;
+                    buffer2.append(" ");
+
+                    //used for finding the future air dates for the listings BY DAY
+                    for (int fg = 0; fg < (intTotalEpisodes + 1); fg++) {
+
+                        String newstring = new SimpleDateFormat("dd/MM/yy HH:mm").format(temp);
+
+                        buffer2.append(fg + ": " + newstring + " ");
+
+                        int noOfDays = 1;
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(temp);
+                        calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
+
+                        Date nextDate = calendar.getTime();
+
+                        temp = nextDate;
+                    }
+
+                    meme = buffer2.toString();
+                    System.out.println(meme);
+                }
+
+                long lngFinalAirTime;
+                long lngBigMillis;
+
+                if (radioSelected.getText().equals("Weekly")) { //does same for above but for a week instead of day
+                    int f;
+                    for (f = 0; f < (intTotalEpisodes + 1); f++) {
+                        strNotificationIDprefix = "" + id + "00";
+                        intNotificationIDprefix = Integer.parseInt(strNotificationIDprefix);
+                        intNotificationIDprefix = intNotificationIDprefix + f;
+                        lngFinalAirTime = lngTimeUntilAir;
+                        lngBigMillis = Long.valueOf(86400000 * f);
+                        System.out.println(lngBigMillis);
+                        lngFinalAirTime = lngFinalAirTime + lngBigMillis;
+                        scheduleNotification(getNotification(editName.getText().toString()), lngFinalAirTime);
+                        System.out.println("TIME UNTIL THE NOTIFICATION FOR WEEK " + f + " : " + (lngFinalAirTime));
+                        System.out.println(f);
+                    }
+
+                    StringBuffer buffer2 = new StringBuffer();
+
+
+                    Date date2 = sdf.parse(mm);
+                    Date temp = date2;
+                    buffer2.append(" ");
+
+
+                    //used for finding the future air dates for the listings BY WEEK
+                    for (int fg = 0; fg < (intTotalEpisodes + 1); fg++) {
+
+                        String newstring = new SimpleDateFormat("dd/MM/yy HH:mm").format(temp);
+
+                        buffer2.append(fg + ": " + newstring + " ");
+
+                        int noOfDays = 7;
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(temp);
+                        calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
+
+                        Date nextDate = calendar.getTime();
+
+                        temp = nextDate;
+                    }
+
+                    meme = buffer2.toString();
+                    System.out.println(meme);
+                }
+
+
+                //inserts the new listing into the master database
+                db2.execSQL("INSERT INTO Shows VALUES('"
+                        + id
+                        + "','" +
+                        editName.getText()
+                        + "','" +
+                        editSeason.getText()
+                        + "','" +
+                        editNumberEpisodes.getText()
+                        + "','" +
+                        editCurrentEpisode.getText()
+                        + "','" +
+                        editAirTime.getText()
+                        + "','" +
+                        meme
+                        + "','" +
+                        radioSelected.getText()
+                        + "');");
+
+
+                //used for displayed the listing details after they have been injected into the SQL database
+
+                //inits the cursor to find the location of the correct listing where the name matches the listing
+                //just created
+                Cursor c = db2.rawQuery("SELECT * FROM Shows WHERE name='" + editName.getText() + "'", null);
+
+                //used to handle any null exceptions
+                if (c.getCount() == 0) {
+                    showMessage("Error", "No records found");
+                    return;
+                }
+                //buffers the SQL listing and invokes the showMessage void to display the listing details
+                StringBuffer buffer = new StringBuffer();
+                while (c.moveToNext()) {
+
+                    buffer.append("ID: " + c.getString(0) + "\n");
+                    buffer.append("Name: " + c.getString(1) + "\n");
+                    buffer.append("Season Number: " + c.getString(2) + "\n");
+                    buffer.append("Number of Episodes: " + c.getString(3) + "\n");
+                    buffer.append("Current Episode: " + c.getString(4) + "\n");
+                    buffer.append("Air Time: " + c.getString(5) + "\n");
+                    buffer.append("Next Episode Airs: " + (c.getString(6).substring(4, 10) + "20" + c.getString(6).substring(10, 12) + "\n"));
+                    buffer.append("Air Freq: " + c.getString(7) + "\n\n");
+                }
+                showMessage("Listing Details", buffer.toString());
+
             }
-            StringBuffer buffer2 = new StringBuffer();
-
-
-            Date date2 = sdf.parse(mm);
-            Date temp = date2;
-            buffer2.append(" ");
-
-            //used for finding the future air dates for the listings BY DAY
-            for(int fg=0;fg < (intTotalEpisodes + 1);fg++) {
-
-                String newstring = new SimpleDateFormat("dd/MM/yy HH:mm").format(temp);
-
-                buffer2.append(fg + ": " + newstring + " ");
-
-                int noOfDays = 1;
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(temp);
-                calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
-
-                Date nextDate = calendar.getTime();
-
-                temp = nextDate;
-            }
-
-            meme = buffer2.toString();
-            System.out.println(meme);
-        }
-
-            long lngFinalAirTime;
-            long lngBigMillis;
-
-        if (radioSelected.getText().equals("Weekly")) { //does same for above but for a week instead of day
-            int f;
-            for (f = 0; f < (intTotalEpisodes + 1); f++) {
-                strNotificationIDprefix = "" + id + "00";
-                intNotificationIDprefix = Integer.parseInt(strNotificationIDprefix);
-                intNotificationIDprefix = intNotificationIDprefix + f;
-                lngFinalAirTime = lngTimeUntilAir;
-                lngBigMillis = Long.valueOf(86400000 * f);
-                System.out.println(lngBigMillis);
-                lngFinalAirTime = lngFinalAirTime + lngBigMillis;
-                scheduleNotification(getNotification(editName.getText().toString()), lngFinalAirTime);
-                System.out.println("TIME UNTIL THE NOTIFICATION FOR WEEK " + f + " : " +  (lngFinalAirTime));
-                System.out.println(f);
-            }
-
-            StringBuffer buffer2 = new StringBuffer();
-
-
-            Date date2 = sdf.parse(mm);
-            Date temp = date2;
-            buffer2.append(" ");
-
-
-            //used for finding the future air dates for the listings BY WEEK
-            for(int fg=0;fg < (intTotalEpisodes + 1);fg++) {
-
-                String newstring = new SimpleDateFormat("dd/MM/yy HH:mm").format(temp);
-
-                buffer2.append(fg + ": " + newstring + " ");
-
-                int noOfDays = 7;
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(temp);
-                calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
-
-                Date nextDate = calendar.getTime();
-
-                temp = nextDate;
-            }
-
-            meme = buffer2.toString();
-            System.out.println(meme);
-        }
-
-
-
-
-        //inserts the new listing into the master database
-        db2.execSQL("INSERT INTO Shows VALUES('"
-                + id
-                + "','" +
-                editName.getText()
-                + "','" +
-                editSeason.getText()
-                + "','" +
-                editNumberEpisodes.getText()
-                + "','" +
-                editCurrentEpisode.getText()
-                + "','" +
-                editAirTime.getText()
-                + "','" +
-                meme
-                + "','" +
-                radioSelected.getText()
-                + "');");
-
-
-        //used for displayed the listing details after they have been injected into the SQL database
-
-        //inits the cursor to find the location of the correct listing where the name matches the listing
-        //just created
-        Cursor c = db2.rawQuery("SELECT * FROM Shows WHERE name='" + editName.getText() + "'", null);
-
-        //used to handle any null exceptions
-        if (c.getCount() == 0) {
-            showMessage("Error", "No records found");
-            return;
-        }
-        //buffers the SQL listing and invokes the showMessage void to display the listing details
-        StringBuffer buffer = new StringBuffer();
-        while (c.moveToNext()) {
-
-            buffer.append("ID: " + c.getString(0) + "\n");
-            buffer.append("Name: " + c.getString(1) + "\n");
-            buffer.append("Season Number: " + c.getString(2) + "\n");
-            buffer.append("Number of Episodes: " + c.getString(3) + "\n");
-            buffer.append("Current Episode: " + c.getString(4) + "\n");
-            buffer.append("Air Time: " + c.getString(5) + "\n");
-            buffer.append("Next Episode Airs: " +(c.getString(6).substring(4,10) + "20" + c.getString(6).substring(10,12) + "\n"));
-            buffer.append("Air Freq: " + c.getString(7) + "\n\n");
-        }
-        showMessage("Listing Details", buffer.toString());
 
         }
-
     }
 }

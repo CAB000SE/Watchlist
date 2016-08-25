@@ -11,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
@@ -105,14 +106,24 @@ public class ModifyPage extends AppCompatActivity {
 
         displayList();
 
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
-                this,
-                android.R.layout.simple_list_item_1,
-                arrListings );
+        ArrayAdapter<String> arrayAdapter=new ArrayAdapter<String>(
+                this,android.R.layout.simple_list_item_1, arrListings){
+
+            //used to quickly change the colour to black
+            @Override
+            public View getView(int position, View convertView,
+                                ViewGroup parent) {
+                View view =super.getView(position, convertView, parent);
+
+                TextView textView=(TextView) view.findViewById(android.R.id.text1);
+
+                textView.setTextColor(Color.BLACK);
+
+                return view;
+            }
+        };
 
         lv.setAdapter(arrayAdapter);
-
-
 
     }
 
@@ -376,160 +387,164 @@ public class ModifyPage extends AppCompatActivity {
         System.out.println("VARIABLE: id - " + id);
         addListenerOnButton();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy hh:mm");
-        String mm = editAirDate.getText().toString() + " " + editAirTime.getText().toString();
-        System.out.println(mm);
-        Date date = sdf.parse(mm);
-        long lngCurrentTime = System.currentTimeMillis();
-        System.out.println("CURRENT TIME " + lngCurrentTime);
+        if (editName.getText().toString().equals("") || editSeason.getText().toString().equals("") || editNumberEpisodes.getText().toString().equals("") || editCurrentEpisode.getText().toString().equals("") || editAirTime.getText().toString().equals("") || editAirDate.getText().toString().equals("")) {
+            showMessage("Error", "Please ensure all fields are correctly filled out.");
+        } else {
 
-        String meme = "";
-        int intTotalEpisodes = Integer.parseInt(editNumberEpisodes.getText().toString()) - Integer.parseInt( editCurrentEpisode.getText().toString()) ;
-        System.out.println("INTTOTALEPISODES" + intTotalEpisodes);
-        System.out.println("Date - Time in milliseconds : " + date.getTime());
-        long longTimeUntil = date.getTime();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy hh:mm");
+            String mm = editAirDate.getText().toString() + " " + editAirTime.getText().toString();
+            System.out.println(mm);
+            Date date = sdf.parse(mm);
+            long lngCurrentTime = System.currentTimeMillis();
+            System.out.println("CURRENT TIME " + lngCurrentTime);
 
-        long lngTimeUntilAir = longTimeUntil - lngCurrentTime;
+            String meme = "";
+            int intTotalEpisodes = Integer.parseInt(editNumberEpisodes.getText().toString()) - Integer.parseInt(editCurrentEpisode.getText().toString());
+            System.out.println("INTTOTALEPISODES" + intTotalEpisodes);
+            System.out.println("Date - Time in milliseconds : " + date.getTime());
+            long longTimeUntil = date.getTime();
 
-        Calendar cal = Calendar.getInstance();
-        Date currentDate = cal.getTime();
-        String strNotificationIDprefix;
+            long lngTimeUntilAir = longTimeUntil - lngCurrentTime;
+
+            Calendar cal = Calendar.getInstance();
+            Date currentDate = cal.getTime();
+            String strNotificationIDprefix;
 
 
-        if(currentDate.after(date)){
-            showMessage("Error", "Please select a future date for scheduling TV Listings");
-        }else {
+            if (currentDate.after(date)) {
+                showMessage("Error", "Please select a future date for scheduling TV Listings");
+            } else {
 
-            System.out.println("TIME UNTIL " + lngTimeUntilAir);
+                System.out.println("TIME UNTIL " + lngTimeUntilAir);
 
-            if (radioSelected.getText().equals("Daily")) {
+                if (radioSelected.getText().equals("Daily")) {
 
-                int f;
-                for (f = 0; f < (intTotalEpisodes + 1); f++) {
-                    strNotificationIDprefix = "" + id + "00";
-                    intNotificationIDprefix = Integer.parseInt(strNotificationIDprefix);
-                    intNotificationIDprefix = intNotificationIDprefix + f;
-                    scheduleNotification(getNotification(editName.getText().toString()), (lngTimeUntilAir + (86400000 * f)));
-                    System.out.println("TIME UNTIL THE NOTIFICATION FOR DAY " + f + " : " + (lngTimeUntilAir + (86400000 * f)));
+                    int f;
+                    for (f = 0; f < (intTotalEpisodes + 1); f++) {
+                        strNotificationIDprefix = "" + id + "00";
+                        intNotificationIDprefix = Integer.parseInt(strNotificationIDprefix);
+                        intNotificationIDprefix = intNotificationIDprefix + f;
+                        scheduleNotification(getNotification(editName.getText().toString()), (lngTimeUntilAir + (86400000 * f)));
+                        System.out.println("TIME UNTIL THE NOTIFICATION FOR DAY " + f + " : " + (lngTimeUntilAir + (86400000 * f)));
+                    }
+
+                    StringBuffer buffer2 = new StringBuffer();
+
+
+                    Date date2 = sdf.parse(mm);
+                    Date temp = date2;
+
+                    buffer2.append(" ");
+
+                    for (int fg = 0; fg < (intTotalEpisodes + 1); fg++) {
+
+                        String newstring = new SimpleDateFormat("dd/MM/yy HH:mm").format(temp);
+
+                        buffer2.append(fg + ": " + newstring + " ");
+
+                        int noOfDays = 7; //i.e two weeks
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(temp);
+                        calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
+
+                        Date nextDate = calendar.getTime();
+
+                        temp = nextDate;
+                    }
+
+                    meme = buffer2.toString();
+                    System.out.println(meme);
                 }
 
-                StringBuffer buffer2 = new StringBuffer();
+                long lngFinalAirTime;
+                long lngBigMillis;
+
+                if (radioSelected.getText().equals("Weekly")) {
+                    int f;
+                    for (f = 0; f < (intTotalEpisodes + 1); f++) {
+                        strNotificationIDprefix = "" + id + "00";
+                        intNotificationIDprefix = Integer.parseInt(strNotificationIDprefix);
+                        intNotificationIDprefix = intNotificationIDprefix + f;
+                        lngFinalAirTime = lngTimeUntilAir;
+                        lngBigMillis = Long.valueOf(86400000 * f);
+                        System.out.println(lngBigMillis);
+                        lngFinalAirTime = lngFinalAirTime + lngBigMillis;
+                        scheduleNotification(getNotification(editName.getText().toString()), lngFinalAirTime);
+                        System.out.println("TIME UNTIL THE NOTIFICATION FOR WEEK " + f + " : " + (lngFinalAirTime));
+                        System.out.println(f);
+                    }
+
+                    StringBuffer buffer2 = new StringBuffer();
 
 
-                Date date2 = sdf.parse(mm);
-                Date temp = date2;
+                    Date date2 = sdf.parse(mm);
+                    Date temp = date2;
+                    buffer2.append(" ");
 
-                buffer2.append(" ");
 
-                for (int fg = 0; fg < (intTotalEpisodes + 1); fg++) {
+                    for (int fg = 0; fg < (intTotalEpisodes + 1); fg++) {
 
-                    String newstring = new SimpleDateFormat("dd/MM/yy HH:mm").format(temp);
+                        String newstring = new SimpleDateFormat("dd/MM/yy HH:mm").format(temp);
 
-                    buffer2.append(fg + ": " + newstring + " ");
+                        buffer2.append(fg + ": " + newstring + " ");
 
-                    int noOfDays = 7; //i.e two weeks
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(temp);
-                    calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
+                        int noOfDays = 7; //i.e two weeks
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(temp);
+                        calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
 
-                    Date nextDate = calendar.getTime();
+                        Date nextDate = calendar.getTime();
 
-                    temp = nextDate;
+                        temp = nextDate;
+                    }
+
+                    meme = buffer2.toString();
+                    System.out.println(meme);
+
                 }
 
-                meme = buffer2.toString();
-                System.out.println(meme);
-            }
 
-            long lngFinalAirTime;
-            long lngBigMillis;
+                Cursor c = db.rawQuery("SELECT * FROM Shows WHERE id='" + intSelectedID + "'", null);
+                if (c.moveToFirst()) {
 
-            if (radioSelected.getText().equals("Weekly")) {
-                int f;
-                for (f = 0; f < (intTotalEpisodes + 1); f++) {
-                    strNotificationIDprefix = "" + id + "00";
-                    intNotificationIDprefix = Integer.parseInt(strNotificationIDprefix);
-                    intNotificationIDprefix = intNotificationIDprefix + f;
-                    lngFinalAirTime = lngTimeUntilAir;
-                    lngBigMillis = Long.valueOf(86400000 * f);
-                    System.out.println(lngBigMillis);
-                    lngFinalAirTime = lngFinalAirTime + lngBigMillis;
-                    scheduleNotification(getNotification(editName.getText().toString()), lngFinalAirTime);
-                    System.out.println("TIME UNTIL THE NOTIFICATION FOR WEEK " + f + " : " +  (lngFinalAirTime));
-                    System.out.println(f);
+                    db.execSQL("UPDATE Shows SET name='"
+                            + editName.getText()
+                            + "',seasonno='"
+                            + editSeason.getText()
+                            + "',noepisodes='"
+                            + editNumberEpisodes.getText()
+                            + "',curepisode='"
+                            + editCurrentEpisode.getText()
+                            + "',airtime='"
+                            + editAirTime.getText()
+                            + "',airdate='"
+                            + meme
+                            + "',airfreq='"
+                            + radioSelected.getText()
+                            +
+                            "' WHERE id='" + intSelectedID + "'");
                 }
 
-                StringBuffer buffer2 = new StringBuffer();
+                StringBuffer buffer = new StringBuffer();
+                Cursor d = db.rawQuery("SELECT * FROM Shows WHERE name='" + editName.getText() + "'", null);
 
+                while (d.moveToNext()) {
 
-                Date date2 = sdf.parse(mm);
-                Date temp = date2;
-                buffer2.append(" ");
+                    buffer.append("ID: " + d.getString(0) + "\n");
+                    buffer.append("Name: " + d.getString(1) + "\n");
+                    buffer.append("Season Number: " + d.getString(2) + "\n");
+                    buffer.append("Number of Episodes: " + d.getString(3) + "\n");
+                    buffer.append("Current Episode: " + d.getString(4) + "\n");
+                    buffer.append("Air Time: " + d.getString(5) + "\n");
+                    buffer.append("Next Episode Airs: " + (d.getString(6).substring(4, 10) + "20" + d.getString(6).substring(10, 12) + "\n"));
+                    buffer.append("Air Freq: " + d.getString(7) + "\n\n");
 
+                    showMessage("Listing Details", buffer.toString());
 
-                for (int fg = 0; fg < (intTotalEpisodes + 1); fg++) {
-
-                    String newstring = new SimpleDateFormat("dd/MM/yy HH:mm").format(temp);
-
-                    buffer2.append(fg + ": " + newstring + " ");
-
-                    int noOfDays = 7; //i.e two weeks
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(temp);
-                    calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
-
-                    Date nextDate = calendar.getTime();
-
-                    temp = nextDate;
                 }
 
-                meme = buffer2.toString();
-                System.out.println(meme);
-
             }
-
-
-            Cursor c = db.rawQuery("SELECT * FROM Shows WHERE id='" + intSelectedID + "'", null);
-            if (c.moveToFirst()) {
-
-                db.execSQL("UPDATE Shows SET name='"
-                        + editName.getText()
-                        + "',seasonno='"
-                        + editSeason.getText()
-                        + "',noepisodes='"
-                        + editNumberEpisodes.getText()
-                        + "',curepisode='"
-                        + editCurrentEpisode.getText()
-                        + "',airtime='"
-                        + editAirTime.getText()
-                        + "',airdate='"
-                        + meme
-                        + "',airfreq='"
-                        + radioSelected.getText()
-                        +
-                        "' WHERE id='" + intSelectedID + "'");
-            }
-
-            StringBuffer buffer = new StringBuffer();
-            Cursor d = db.rawQuery("SELECT * FROM Shows WHERE name='" + editName.getText() + "'", null);
-
-            while (d.moveToNext()) {
-
-                buffer.append("ID: " + d.getString(0) + "\n");
-                buffer.append("Name: " + d.getString(1) + "\n");
-                buffer.append("Season Number: " + d.getString(2) + "\n");
-                buffer.append("Number of Episodes: " + d.getString(3) + "\n");
-                buffer.append("Current Episode: " + d.getString(4) + "\n");
-                buffer.append("Air Time: " + d.getString(5) + "\n");
-                buffer.append("Next Episode Airs: " +(d.getString(6).substring(4,10) + "20" + d.getString(6).substring(10,12) + "\n"));
-                buffer.append("Air Freq: " + d.getString(7) + "\n\n");
-
-                showMessage("Listing Details", buffer.toString());
-
-            }
-
         }
-
     }
 
 }

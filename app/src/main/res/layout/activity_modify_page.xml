@@ -150,7 +150,8 @@
         android:layout_above="@+id/button3"
         android:layout_below="@+id/textView"
         android:layout_alignEnd="@+id/textView"
-        android:visibility="invisible">
+        android:visibility="invisible"
+        android:checkedButton="@+id/option1">
 
         <RadioButton
             android:layout_width="128dp"
@@ -192,6 +193,7 @@
         android:id="@+id/listView2"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/button1"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        />
 
 </RelativeLayout>
