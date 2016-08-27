@@ -87,7 +87,7 @@ public class ModifyPage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_modify_page);
+        setContentView(R.layout.modifypage);
 
         editName=(EditText)findViewById(R.id.editText);
         editSeason=(EditText)findViewById(R.id.editText2);
