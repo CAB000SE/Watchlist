@@ -40,6 +40,8 @@ public class SettingsPage extends AppCompatActivity {
             radioGroupMain.check(R.id.orderID);
         }
 
+        addListenerOnButton();
+
 
     }
 
