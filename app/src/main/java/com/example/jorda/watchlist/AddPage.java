@@ -51,7 +51,7 @@ public class AddPage extends AppCompatActivity {
 
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_page);
+        setContentView(R.layout.addpage);
 
 
         editName = (EditText) findViewById(R.id.editText);
