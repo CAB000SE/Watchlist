@@ -57,7 +57,7 @@ public class UpcomingPage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_upcoming_page);
+        setContentView(R.layout.upcomingpage);
 
         //creates the listview to be populated
         listView = (ListView) findViewById(R.id.listView);

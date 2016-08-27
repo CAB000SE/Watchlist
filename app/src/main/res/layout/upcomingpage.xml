@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#d7d7d7d7">
+
+    <Button
+        android:text="Add Tv Show"
+        android:layout_width="99dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/button"
+        android:onClick="gotoAdd"
+        android:background="@drawable/blackbutton"
+        android:textColor="#FFFFFF"
+        android:textSize="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:text="Upcoming Episodes"
+        android:layout_width="112dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/button2"
+        android:onClick="gotoUpcoming"
+        android:textSize="10dp"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/blackbutton"
+        app:layout_constraintBaseline_toBaselineOf="@+id/button1"
+        app:layout_constraintLeft_toRightOf="@+id/button1" />
+
+    <Button
+        android:text="Modify TV Listing"
+        android:layout_width="101dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/button1"
+        android:onClick="gotoModify"
+        android:textSize="10dp"
+        android:background="@drawable/blackbutton"
+        app:layout_constraintLeft_toRightOf="@+id/button"
+        app:layout_constraintBaseline_toBaselineOf="@+id/button" />
+
+    <ImageButton
+        android:layout_width="49dp"
+        android:layout_height="48dp"
+        app:srcCompat="@drawable/settings"
+        android:id="@+id/imageButton"
+        android:onClick="gotoSettings"
+        app:layout_constraintHorizontal_bias="0.25"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/button2" />
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/listView"
+        android:layout_below="@+id/button"
+        android:layout_centerHorizontal="true"
+        app:layout_constraintTop_toBottomOf="@+id/button"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+</android.support.constraint.ConstraintLayout>
