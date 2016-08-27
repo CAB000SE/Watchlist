@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.jorda.watchlist.SettingsPage"
     android:background="#d7d7d7d7">
 
@@ -18,9 +15,14 @@
         android:background="#000000"
         android:textColor="#FFFFFF"
         android:textSize="12dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:onClick="gotoAdd"/>
+        android:onClick="gotoAdd"
+        tools:layout_conversion_absoluteX="16dp"
+        tools:layout_conversion_absoluteY="16dp"
+        tools:layout_conversion_absoluteWidth="88dp"
+        tools:layout_conversion_absoluteHeight="48dp"
+        tools:layout_editor_absoluteY="16dp"
+        tools:layout_editor_absoluteX="16dp" />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,11 +31,14 @@
         android:background="#000000"
         android:textColor="#FFFFFF"
         android:textSize="10dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignEnd="@+id/button2"
-        android:layout_marginEnd="97dp"
-        android:layout_toEndOf="@+id/button"
-        android:onClick="gotoModify"/>
+        android:onClick="gotoModify"
+        tools:layout_conversion_absoluteX="104dp"
+        tools:layout_conversion_absoluteY="16dp"
+        tools:layout_conversion_absoluteWidth="112dp"
+        tools:layout_conversion_absoluteHeight="48dp"
+        tools:layout_editor_absoluteY="16dp"
+        tools:layout_editor_absoluteX="104dp" />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,66 +47,84 @@
         android:background="#000000"
         android:textColor="#FFFFFF"
         android:textSize="10dp"
-        android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/imageButton"
-        android:onClick="gotoUpcoming"/>
+        android:onClick="gotoUpcoming"
+        tools:layout_conversion_absoluteX="212dp"
+        tools:layout_conversion_absoluteY="16dp"
+        tools:layout_conversion_absoluteWidth="101dp"
+        tools:layout_conversion_absoluteHeight="48dp"
+        tools:layout_editor_absoluteY="16dp"
+        tools:layout_editor_absoluteX="212dp" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView"
-        android:layout_toEndOf="@+id/button1" />
+        tools:layout_conversion_absoluteX="313dp"
+        tools:layout_conversion_absoluteY="16dp"
+        tools:layout_conversion_absoluteWidth="0dp"
+        tools:layout_conversion_absoluteHeight="0dp"
+        tools:layout_editor_absoluteY="16dp"
+        tools:layout_editor_absoluteX="313dp" />
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageButton"
         android:src="@drawable/settings"
-        android:layout_alignBottom="@+id/button2"
-        android:layout_alignParentEnd="true"
         android:background="#ffffff"
-        android:onClick="gotoSettings"/>
+        android:onClick="gotoSettings"
+        tools:layout_conversion_absoluteX="313dp"
+        tools:layout_conversion_absoluteY="16dp"
+        tools:layout_conversion_absoluteWidth="55dp"
+        tools:layout_conversion_absoluteHeight="48dp"
+        tools:layout_editor_absoluteY="16dp"
+        tools:layout_editor_absoluteX="313dp" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="DELETE ALL LISTINGS"
         android:id="@+id/button4"
-        android:layout_marginTop="52dp"
         android:onClick="deleteAll"
-        android:layout_below="@+id/button1"
-        android:layout_centerHorizontal="true" />
+        tools:layout_conversion_absoluteX="109dp"
+        tools:layout_conversion_absoluteY="116dp"
+        tools:layout_conversion_absoluteWidth="165dp"
+        tools:layout_conversion_absoluteHeight="48dp"
+        tools:layout_editor_absoluteY="116dp"
+        tools:layout_editor_absoluteX="104dp" />
 
     <RadioGroup
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="384dp"
+        android:layout_height="477dp"
         android:id="@+id/radioGroup1"
         android:checkedButton="@+id/option1"
-        android:layout_marginTop="110dp"
-        android:layout_below="@+id/button4"
-        android:layout_alignStart="@+id/button4"
-        android:layout_alignEnd="@+id/button4">
+        tools:layout_conversion_absoluteX="109dp"
+        tools:layout_conversion_absoluteY="274dp"
+        tools:layout_conversion_absoluteWidth="165dp"
+        tools:layout_conversion_absoluteHeight="277dp"
+        tools:layout_editor_absoluteY="274dp"
+        tools:layout_editor_absoluteX="109dp">
 
-    <RadioButton
-        android:layout_width="128dp"
-        android:layout_height="wrap_content"
-        android:text="Order By ID"
-        android:layout_below="@+id/option1b"
-        android:layout_alignStart="@+id/option1b"
-        android:checked="true"
-        android:id="@+id/orderID"
-        android:onClick="reset"/>
+        <RadioButton
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
+            android:text="Order By ID"
+            android:layout_below="@+id/option1b"
+            android:layout_alignStart="@+id/option1b"
+            android:checked="true"
+            android:id="@+id/orderID"
+            android:onClick="reset" />
 
-    <RadioButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/orderName"
-        android:text="Order By Name"
-        android:checked="false"
-        android:layout_below="@+id/option1a"
-        android:layout_alignRight="@+id/imageView"
-        android:onClick="reset"/>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/orderName"
+            android:text="Order By Name"
+            android:checked="false"
+            android:layout_below="@+id/option1a"
+            android:layout_alignRight="@+id/imageView"
+            android:onClick="reset" />
 
     </RadioGroup>
 
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>

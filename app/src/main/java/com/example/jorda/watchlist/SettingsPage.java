@@ -28,7 +28,7 @@ public class SettingsPage extends AppCompatActivity {
         int orderFashion = pref.getInt("your key1", 0); //1 is default value.
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings_page);
+        setContentView(R.layout.settingspage);
 
         db2 = openOrCreateDatabase("newTVDB", Context.MODE_PRIVATE, null);
 
