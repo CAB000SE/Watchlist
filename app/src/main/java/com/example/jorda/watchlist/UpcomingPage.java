@@ -43,6 +43,11 @@ import java.util.concurrent.TimeUnit;
 
 public class UpcomingPage extends AppCompatActivity {
 
+    //TODO: handle ' in sqldatabase
+    //TODO: dialog when "delete all listings" is selected
+    //TODO: refresh after modifypage listing delete
+    //TODO: fix layout
+
     ListView listView;
     SQLiteDatabase db2;
     ArrayList al = new ArrayList();
@@ -95,7 +100,6 @@ public class UpcomingPage extends AppCompatActivity {
 
             StringBuffer buffer = new StringBuffer();
 
-            //TODO: determine if the intEpisodesRemaining variable is useless
             intEpisodesRemaining = Integer.parseInt(c.getString(3)) - Integer.parseInt(c.getString(4));
             int intCurrentEpisode = 1;
 
@@ -128,7 +132,6 @@ public class UpcomingPage extends AppCompatActivity {
                 }
 
                 if(currentDate.before(date)){ //used to determine if the current date is before the next episode, if yes then it has found the correct episode and the for can break
-                   //TODO: ensure the variable below can handle a listing edit correctly
                     intCurrentEpisode = f + 1; //sets the current number of episodes
                     m=true;
                 }
@@ -186,7 +189,6 @@ public class UpcomingPage extends AppCompatActivity {
                 JSONObject json = new JSONObject(readUrl("http://www.omdbapi.com/?t=" + possibleSearch));
 
                 //grabs both the Poster URL as well as the imdbID which is used as the fileName (not required, but it works)
-                //TODO: change below variables name to something more appropriate
                 String imID = (String) json.get("Poster");
                 fileName = (String) json.get("imdbID");
 
@@ -291,7 +293,6 @@ public class UpcomingPage extends AppCompatActivity {
 
 
         //used to automatically refresh the display every minute.
-        //TODO: determine if the below is really necessary
         mHandler.postDelayed(new Runnable() {
             public void run() {
                 listView.setAdapter(null);
@@ -323,12 +324,11 @@ public class UpcomingPage extends AppCompatActivity {
                 downloadUri);
 
         //allows the image to be downloaded over a wifi or mobile network but not on roaming. Sets to download to correct directory using correct name
-        //TODO: change below strings
         request.setAllowedNetworkTypes(
                 DownloadManager.Request.NETWORK_WIFI
                         | DownloadManager.Request.NETWORK_MOBILE)
-                .setAllowedOverRoaming(false).setTitle("Demo")
-                .setDescription("Something useful. No, really.")
+                .setAllowedOverRoaming(false).setTitle("Watchlistdownload")
+                .setDescription("Used for downloading posters for Watchlist")
                 .setDestinationInExternalPublicDir("/Watchlist_images", fileName + ".jpg");
 
         //downloads the image

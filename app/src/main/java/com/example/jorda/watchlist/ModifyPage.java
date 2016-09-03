@@ -398,9 +398,28 @@ public class ModifyPage extends AppCompatActivity {
         System.out.println("VARIABLE: id - " + id);
         addListenerOnButton();
 
+        try{
+            Integer.parseInt(editNumberEpisodes.getText().toString());
+            Integer.parseInt(editCurrentEpisode.getText().toString());
+            Integer.parseInt(editSeason.getText().toString());
+        }catch (NumberFormatException e){
+            showMessage("Error", "Please ensure correct data has been filled out for each field");
+            return;
+        }
+
         if (editName.getText().toString().equals("") || editSeason.getText().toString().equals("") || editNumberEpisodes.getText().toString().equals("") || editCurrentEpisode.getText().toString().equals("") || editAirTime.getText().toString().equals("") || editAirDate.getText().toString().equals("")) {
             showMessage("Error", "Please ensure all fields are correctly filled out.");
-        } else {
+        }else if( Integer.parseInt(editNumberEpisodes.getText().toString()) < Integer.parseInt(editCurrentEpisode.getText().toString())){
+            showMessage("Error", "The current episode in the season cannot be larger than the total number of episodes in the season.");
+        }else if( Integer.parseInt(editSeason.getText().toString()) > 1000){
+            showMessage("Error", "Season number must be between 1-1000");
+        }else if( Integer.parseInt(editSeason.getText().toString()) < 0 ){
+            showMessage("Error", "Season Number must be a number between 1-1000");
+        }else if( Integer.parseInt(editNumberEpisodes.getText().toString()) < 0 || Integer.parseInt(editNumberEpisodes.getText().toString()) > 100 ){
+            showMessage("Error", "Total Episodes must be a number between 1-100");
+        }else if( Integer.parseInt(editCurrentEpisode.getText().toString()) < 0 || Integer.parseInt(editCurrentEpisode.getText().toString()) > 100 ){
+            showMessage("Error", "Current episode must be a number between 1-100");
+        }else {
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy hh:mm");
             String mm = editAirDate.getText().toString() + " " + editAirTime.getText().toString();
