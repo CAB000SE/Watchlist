@@ -7,12 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -20,44 +15,29 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 public class UpcomingPage extends AppCompatActivity {
 
-    //TODO: handle ' in sqldatabase
-    //TODO: dialog when "delete all listings" is selected
-    //TODO: refresh after modifypage listing delete
-    //TODO: fix layout
+    ListView lstMain;
+    SQLiteDatabase sqlTVListings;
+    ArrayList arrListString = new ArrayList();
+    ArrayList arrListBitmap = new ArrayList();
 
-    ListView listView;
-    SQLiteDatabase db2;
-    ArrayList al = new ArrayList();
-    ArrayList bl = new ArrayList();
-
-    Date date;
-    String fileName = "";
-    private Handler mHandler = new Handler();
+    Date datMain;
+    String strFileName = "";
+    private Handler hanRefresh = new Handler();
     int intEpisodesRemaining;
-    Cursor c;
+    Cursor curAllListings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -65,11 +45,11 @@ public class UpcomingPage extends AppCompatActivity {
         setContentView(R.layout.upcomingpage);
 
         //creates the listview to be populated
-        listView = (ListView) findViewById(R.id.listView);
+        lstMain = (ListView) findViewById(R.id.listView);
 
         //opens the database
 
-        db2 = openOrCreateDatabase("newTVDB", Context.MODE_PRIVATE, null);
+        sqlTVListings = openOrCreateDatabase("newTVDB", Context.MODE_PRIVATE, null);
 
         //executes the main loop
         display();
@@ -85,53 +65,53 @@ public class UpcomingPage extends AppCompatActivity {
     public void display(){
 
         SharedPreferences pref = this.getSharedPreferences("Share", Context.MODE_PRIVATE);
-        int orderFashion = pref.getInt("your key1", 0); //1 is default value.
-        System.out.println(orderFashion);
-        if(orderFashion==2){
-            c = db2.rawQuery("SELECT * FROM Shows ORDER BY name COLLATE NOCASE;", null);
+        int intOrderFashion = pref.getInt("your key1", 0); //1 is default value.
+        System.out.println(intOrderFashion);
+        if(intOrderFashion==2){
+            curAllListings = sqlTVListings.rawQuery("SELECT * FROM Shows ORDER BY name COLLATE NOCASE;", null);
         } else{
-            c=db2.rawQuery("SELECT * FROM Shows", null);
+            curAllListings = sqlTVListings.rawQuery("SELECT * FROM Shows", null);
         }
 
 
 
         //buffers the SQL listing and invokes the showMessage void to display the listing details
-        while (c.moveToNext()) {
+        while (curAllListings.moveToNext()) {
 
-            StringBuffer buffer = new StringBuffer();
+            StringBuffer bufListings = new StringBuffer();
 
-            intEpisodesRemaining = Integer.parseInt(c.getString(3)) - Integer.parseInt(c.getString(4));
+            intEpisodesRemaining = Integer.parseInt(curAllListings.getString(3)) - Integer.parseInt(curAllListings.getString(4));
             int intCurrentEpisode = 1;
 
             Calendar cal = Calendar.getInstance();
-            Date currentDate = cal.getTime();
-            System.out.println(currentDate);
+            Date datCurrent = cal.getTime();
+            System.out.println(datCurrent);
 
-            String mm = "";
+            String strDateOfListing = "";
             boolean m = false;
-            for(int f=0; !m ;f++){ //this for finds the next possible air date and time based off the substring.
+            for(int f=0; !m ;f++){ //this for finds the next possible air datMain and time based off the substring.
 
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy hh:mm"); //used later to convert to a readable format
                 try{
-                    mm = c.getString(6).substring((f*18)+4,(f*18)+18); //f will increase when the previous episode has aired
+                    strDateOfListing = curAllListings.getString(6).substring((f*18)+4,(f*18)+18); //f will increase when the previous episode has aired
                 }catch(Exception e){
                     /*this catch is vital is recognising complete seasons. if the error for the index size being to small occurs,
                     we can assume that the season is complete as there is no remaining episodes. the variable is set to a
-                    default date which is tested later to determine if the season is complete. m becomes true to break the for loop*/
-                    mm = "01/01/16 01:01";
+                    default datMain which is tested later to determine if the season is complete. m becomes true to break the for loop*/
+                    strDateOfListing = "01/01/16 01:01";
                     m=true;
                 }
 
-                System.out.println(mm);
+                System.out.println(strDateOfListing);
 
                 try { //used to convert the substring found above into a readable format for android
-                    date = sdf.parse(mm);
-                    System.out.println("OTHER VARIABLE   " + date);
+                    datMain = sdf.parse(strDateOfListing);
+                    System.out.println("OTHER VARIABLE   " + datMain);
                 } catch (Exception e) {
                     //catches any errors. highly unlikely in this try
                 }
 
-                if(currentDate.before(date)){ //used to determine if the current date is before the next episode, if yes then it has found the correct episode and the for can break
+                if(datCurrent.before(datMain)){ //used to determine if the current datMain is before the next episode, if yes then it has found the correct episode and the for can break
                     intCurrentEpisode = f + 1; //sets the current number of episodes
                     m=true;
                 }
@@ -140,43 +120,43 @@ public class UpcomingPage extends AppCompatActivity {
 
             //finds the time until the next episode airs
             long lngCurrentTime = System.currentTimeMillis();
-            long longTimeUntil = date.getTime();
-            long lngTimeUntilAir = longTimeUntil - lngCurrentTime;
+            long lngTimeUntil = datMain.getTime();
+            long lngTimeUntilAir = lngTimeUntil - lngCurrentTime;
 
 
             //simple maths to create seconds, minutes, hours, and days from the lngTimeUntilAir variable
-            String time = "";
-            long seconds = lngTimeUntilAir / 1000;
-            long minutes = seconds / 60;
-            long hours = minutes / 60;
-            long days = hours / 24;
+            String strTime = "";
+            long lngSeconds = lngTimeUntilAir / 1000;
+            long lngMinutes = lngSeconds / 60;
+            long lngHours = lngMinutes / 60;
+            long lngDays = lngHours / 24;
 
             //used for handling the display of time, based on the remaining days
-            if(days==0){
-                time =  hours % 24 + " hours, " + minutes % 60 + " minutes";
-            }else if(days==1){
-                time = days + " day, " + hours % 24 + " hours, " + minutes % 60 + " minutes" ;
-            }else if(days>1){
-                time = days + " days, " + hours % 24 + " hours, " + minutes % 60 + " minutes" ;
+            if(lngDays==0){
+                strTime =  lngHours % 24 + " hours, " + lngMinutes % 60 + " minutes";
+            }else if(lngDays==1){
+                strTime = lngDays + " day, " + lngHours % 24 + " hours, " + lngMinutes % 60 + " minutes" ;
+            }else if(lngDays>1){
+                strTime = lngDays + " days, " + lngHours % 24 + " hours, " + lngMinutes % 60 + " minutes" ;
             }
             //adds most of the information to the buffer
-            buffer.append("ID: " + c.getString(0) + "\n");
-            buffer.append("Name: " + c.getString(1) + "\n");
+            bufListings.append("ID: " + curAllListings.getString(0) + "\n");
+            bufListings.append("Name: " + curAllListings.getString(1) + "\n");
             //these 2 lines allow for a more tradition "season" x "episode" look
-            buffer.append("Episode: " + c.getString(2));
-            buffer.append("x" + c.getString(4) + "\n");
+            bufListings.append("Episode: " + curAllListings.getString(2));
+            bufListings.append("x" + curAllListings.getString(4) + "\n");
 
             //handles a complete season
-            if(mm.equals("01/01/16 01:01")){
-                buffer.append("SEASON COMPLETE!" + "\n\n");
+            if(strDateOfListing.equals("01/01/16 01:01")){
+                bufListings.append("SEASON COMPLETE!" + "\n\n");
             }else{ //if season is not complete
-                buffer.append("Time until episode airs: " + (time) + "\n\n");
+                bufListings.append("Time until episode airs: " + (strTime) + "\n\n");
             }
 
 
             //creates a possible search using the name of the listing ; replaces all spaces with a + to be used in the query
-            String possibleSearch = c.getString(1).replaceAll("\\s+","+");
-            System.out.println("POSSIBLE SEARCH : " + possibleSearch);
+            String strPossibleSearch = curAllListings.getString(1).replaceAll("\\s+","+");
+            System.out.println("POSSIBLE SEARCH : " + strPossibleSearch);
 
 
             //enables HTTP to be executed in main thread, suitable for this project
@@ -186,24 +166,24 @@ public class UpcomingPage extends AppCompatActivity {
             try { //used to grab the poster
 
                 //creates a JSON object that is reading the URL provided with the variable determined above
-                JSONObject json = new JSONObject(readUrl("http://www.omdbapi.com/?t=" + possibleSearch));
+                JSONObject jsoAPISearch = new JSONObject(readUrl("http://www.omdbapi.com/?t=" + strPossibleSearch));
 
-                //grabs both the Poster URL as well as the imdbID which is used as the fileName (not required, but it works)
-                String imID = (String) json.get("Poster");
-                fileName = (String) json.get("imdbID");
+                //grabs both the Poster URL as well as the imdbID which is used as the strFileName (not required, but it works)
+                String strPosterURL = (String) jsoAPISearch.get("Poster");
+                strFileName = (String) jsoAPISearch.get("imdbID");
 
                 //this print shows whether a url was found or not
-                System.out.println(imID);
+                System.out.println(strPosterURL);
 
                 //creates a new file with the imdb ID as a name.
-                File ef=new File("/storage/emulated/0/Watchlist_images/" + fileName + ".jpg");
+                File filImage=new File("/storage/emulated/0/Watchlist_images/" + strFileName + ".jpg");
 
-                if(ef.exists() && ! ef.isDirectory()){ //used to determine if the image already exists. it would keep downloading the same image hundreds of times if this wasnt here :/
+                if(filImage.exists() && ! filImage.isDirectory()){ //used to determine if the image already exists. it would keep downloading the same image hundreds of times if this wasnt here :/
                     //breaks if
                 }else{
 
                     //uses the file_download to download using the imID string as a url
-                    file_download(imID);
+                    file_download(strPosterURL);
 
                     /*This try is required in some form as the file_download will be occur at the same time this thread
                     * attempts to continue. This can result on faster phones the listview populating TO quickly and returning
@@ -218,14 +198,14 @@ public class UpcomingPage extends AppCompatActivity {
 
                 try {
                     //finds the previously downloaded file
-                    File f=new File("/storage/emulated/0/Watchlist_images/" + fileName + ".jpg");
-                    System.out.println("/storage/emulated/0/Watchlist_images/" + fileName + ".jpg");
+                    File filPrevious=new File("/storage/emulated/0/Watchlist_images/" + strFileName + ".jpg");
+                    System.out.println("/storage/emulated/0/Watchlist_images/" + strFileName + ".jpg");
 
                     //inflates the custom-made listview layout to this view
                     View view = LayoutInflater.from(getApplication()).inflate(R.layout.mylist, null, true);
 
                     //adds the file to the secondary String array. decoded in the custom list adapter, not here
-                    bl.add(f);
+                    arrListBitmap.add(filPrevious);
 
                 }
                 catch (Exception e)
@@ -235,48 +215,48 @@ public class UpcomingPage extends AppCompatActivity {
 
             } catch (Exception e) {
                 e.printStackTrace();
-                bl.add("N/A"); //this catch occurs when a poster was not downloaded for the listing. "N/A" will allow the CustomListAdapter to set it as the default poster.
+                arrListBitmap.add("N/A"); //this catch occurs when a poster was not downloaded for the listing. "N/A" will allow the CustomListAdapter to set it as the default poster.
             }
 
             //adds the information created way above to the primary array
-            al.add(buffer);
+            arrListString.add(bufListings);
 
             //updates the database based on the new data determined in the episode check way above.
-            db2.execSQL("UPDATE Shows SET curepisode='"
+            sqlTVListings.execSQL("UPDATE Shows SET curepisode='"
                         +intCurrentEpisode+
-                        "' WHERE id='"+c.getString(0)+"'");
+                        "' WHERE id='"+ curAllListings.getString(0)+"'");
 
         }
 
         //used to handle clicks on the listViews items
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        lstMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView parent, View v, int position, long id){
 
-                System.out.println(listView.getItemAtPosition(position));
-                String s = listView.getItemAtPosition(position).toString();
+                System.out.println(lstMain.getItemAtPosition(position));
+                String strListingName = lstMain.getItemAtPosition(position).toString();
 
                 //used to get the name of the listing.
-                s = s.substring(s.indexOf("Name: ") + 6);
-                s = s.substring(0, s.indexOf("Episode"));
+                strListingName = strListingName.substring(strListingName.indexOf("Name: ") + 6);
+                strListingName = strListingName.substring(0, strListingName.indexOf("Episode"));
 
-                System.out.println(s);
+                System.out.println(strListingName);
 
                 //generates the possible search
-                String possibleSearch = s.replaceAll("\\s+","+");
-                System.out.println(possibleSearch);
+                String strPossibleSearch = strListingName.replaceAll("\\s+","+");
+                System.out.println(strPossibleSearch);
 
                 //this try is for determining the imdb url and opening it in app.
                 try {
                     //creates a jsonobject that reads the possible search with API
-                    JSONObject json = new JSONObject(readUrl("http://www.omdbapi.com/?t=" + possibleSearch));
+                    JSONObject jsoAPISearch = new JSONObject(readUrl("http://www.omdbapi.com/?t=" + strPossibleSearch));
 
-                    String imID = (String) json.get("imdbID");
-                    fileName = (String) json.get("imdbID");
-                    System.out.println(imID);
+                    String strImdbID = (String) jsoAPISearch.get("imdbID");
+                    strFileName = (String) jsoAPISearch.get("imdbID");
+                    System.out.println(strImdbID);
 
                     //immediately starts up a web browser that goes directly to the TV shows imdb page
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.imdb.com/title/" + imID + "/"));
-                    startActivity(browserIntent);
+                    Intent intentBrowser = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.imdb.com/title/" + strImdbID + "/"));
+                    startActivity(intentBrowser);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -285,18 +265,18 @@ public class UpcomingPage extends AppCompatActivity {
         });
 
         //adds the primary and secondary arrays to CustomListAdapter to be decoded
-        CustomListAdapter adapter=new CustomListAdapter(this, al, bl);
+        CustomListAdapter adapter=new CustomListAdapter(this, arrListString, arrListBitmap);
 
-        //finally sets the listView to the above adapter
-        listView=(ListView)findViewById(R.id.listView);
-        listView.setAdapter(adapter);
+        //finally sets the lstMain to the above adapter
+        lstMain =(ListView)findViewById(R.id.listView);
+        lstMain.setAdapter(adapter);
 
 
         //used to automatically refresh the display every minute.
-        mHandler.postDelayed(new Runnable() {
+        hanRefresh.postDelayed(new Runnable() {
             public void run() {
-                listView.setAdapter(null);
-                al.clear();
+                lstMain.setAdapter(null);
+                arrListString.clear();
                 display();
             }
         }, 60000);
@@ -306,22 +286,22 @@ public class UpcomingPage extends AppCompatActivity {
     //the file downloader.
     public void file_download(String uRl) {
         //used for below to check if the directory exists
-        File direct = new File("/Watchlist_images");
+        File filDirectory = new File("/Watchlist_images");
 
         //creates the directory if it doesnt exist yet
-        if (!direct.exists()) {
-            direct.mkdirs();
+        if (!filDirectory.exists()) {
+            filDirectory.mkdirs();
         }
 
         //creates the download manage
-        DownloadManager mgr = (DownloadManager) this.getSystemService(Context.DOWNLOAD_SERVICE);
+        DownloadManager mgrMain = (DownloadManager) this.getSystemService(Context.DOWNLOAD_SERVICE);
 
         //parses the string from the secondary array to a downloadable URL
-        Uri downloadUri = Uri.parse(uRl);
+        Uri uriDownloadURL = Uri.parse(uRl);
 
         //requests the image to download
         DownloadManager.Request request = new DownloadManager.Request(
-                downloadUri);
+                uriDownloadURL);
 
         //allows the image to be downloaded over a wifi or mobile network but not on roaming. Sets to download to correct directory using correct name
         request.setAllowedNetworkTypes(
@@ -329,39 +309,39 @@ public class UpcomingPage extends AppCompatActivity {
                         | DownloadManager.Request.NETWORK_MOBILE)
                 .setAllowedOverRoaming(false).setTitle("Watchlistdownload")
                 .setDescription("Used for downloading posters for Watchlist")
-                .setDestinationInExternalPublicDir("/Watchlist_images", fileName + ".jpg");
+                .setDestinationInExternalPublicDir("/Watchlist_images", strFileName + ".jpg");
 
         //downloads the image
-        mgr.enqueue(request);
+        mgrMain.enqueue(request);
     }
 
     //the URL reader. used with the JSON parser exclusively.
     private static String readUrl(String urlString) throws Exception {
 
-        BufferedReader reader = null;
+        BufferedReader burMain = null;
 
         //this try converts the url string created for the API to a readable format and adds it to a readable buffer that can be used with JSON commands to find metadata
         try {
 
-            URL url = new URL(urlString);
+            URL urlAPIListing = new URL(urlString);
             //reads the URL into the BufferedReader created above
-            reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            burMain = new BufferedReader(new InputStreamReader(urlAPIListing.openStream()));
 
-            StringBuffer buffer = new StringBuffer();
-            int read;
+            StringBuffer bufJSONPage = new StringBuffer();
+            int intRead;
             //sets amount of chars that will be read at once in the while.
             char[] chars = new char[1024];
 
             //while more is to be read from the BufferedReader
-            while ((read = reader.read(chars)) != -1)
-                buffer.append(chars, 0, read);
+            while ((intRead = burMain.read(chars)) != -1)
+                bufJSONPage.append(chars, 0, intRead);
 
             //adds the characters read to the buffer
-            return buffer.toString();
+            return bufJSONPage.toString();
         } finally {
             //after the file has successfully read completely, exits the void.
-            if (reader != null)
-                reader.close();
+            if (burMain != null)
+                burMain.close();
         }
     }
 

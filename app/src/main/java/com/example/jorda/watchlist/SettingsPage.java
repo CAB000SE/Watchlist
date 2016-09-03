@@ -3,7 +3,6 @@ package com.example.jorda.watchlist;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -14,9 +13,9 @@ import android.widget.RadioGroup;
 
 public class SettingsPage extends AppCompatActivity {
 
-    SQLiteDatabase db2;
+    SQLiteDatabase sqlTVListings;
     private RadioGroup radioGroupMain;
-    private RadioButton radioSelected;
+    private RadioButton radSelected;
 
 
 
@@ -25,16 +24,16 @@ public class SettingsPage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         SharedPreferences pref = this.getSharedPreferences("Share", Context.MODE_PRIVATE);
-        int orderFashion = pref.getInt("your key1", 0); //1 is default value.
+        int intOrderFashion = pref.getInt("your key1", 0); //1 is default value.
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settingspage);
 
-        db2 = openOrCreateDatabase("newTVDB", Context.MODE_PRIVATE, null);
+        sqlTVListings = openOrCreateDatabase("newTVDB", Context.MODE_PRIVATE, null);
 
         addListenerOnButton();
 
-        if(orderFashion==2){
+        if(intOrderFashion==2){
             radioGroupMain.check(R.id.orderName);
         }else{
             radioGroupMain.check(R.id.orderID);
@@ -46,7 +45,7 @@ public class SettingsPage extends AppCompatActivity {
     }
 
     public void deleteAll(View view){
-        db2.execSQL("DELETE FROM Shows");
+        sqlTVListings.execSQL("DELETE FROM Shows");
     }
 
     public void reset(View view) {
@@ -61,13 +60,13 @@ public class SettingsPage extends AppCompatActivity {
         int selectedId = radioGroupMain.getCheckedRadioButtonId();
 
         // find the radiobutton by returned id
-        radioSelected = (RadioButton) findViewById(selectedId);
+        radSelected = (RadioButton) findViewById(selectedId);
 
-        if(radioSelected.getText().equals("Order By ID")){
+        if(radSelected.getText().equals("Order By ID")){
             orderID();
         }
 
-        if(radioSelected.getText().equals("Order By Name")){
+        if(radSelected.getText().equals("Order By Name")){
             orderName();
         }
 

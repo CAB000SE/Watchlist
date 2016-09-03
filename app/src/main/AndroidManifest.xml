@@ -36,12 +36,7 @@
         <activity android:name=".ModifyPage" />
         <activity android:name=".UpcomingPage" />
         <activity android:name=".SettingsPage" />
-        <activity android:name=".AutoStartUp" />
-        <activity android:name=".JSONParser" />
-        <activity
-            android:name=".CustomListAdapter"
-            android:label="@string/title_activity_custom_list_adapter"
-            android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
+
     </application>
 
 </manifest>

@@ -1,6 +1,5 @@
 package com.example.jorda.watchlist;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.Notification;
@@ -13,7 +12,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,88 +21,74 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CursorAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.SimpleCursorAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
-
-import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.Random;
 
 public class ModifyPage extends AppCompatActivity {
 
 
-    SQLiteDatabase db;
-    EditText editName;
-    EditText editSeason;
-    EditText editNumberEpisodes;
-    EditText editCurrentEpisode;
-    EditText editAirTime;
-    EditText editAirDate;
+    SQLiteDatabase sqlTVListings;
+    EditText edtNameField;
+    EditText edtSeasonField;
+    EditText edtNumberEpisodesField;
+    EditText edtCurrentEpisodeField;
+    EditText edtAirTimeField;
+    EditText edtDateField;
     private RadioGroup radioGroupMain;
-    private RadioButton radioSelected;
-    Button saveListing;
-    Button deleteListing;
-    ListView lv;
-
+    private RadioButton radSelected;
+    Button btnSaveListing;
+    ListView lisMain;
 
     static int id;
 
-    int mYear;
-    int mMonth;
-    int mDay;
+    int intYear;
+    int intMonth;
+    int intDay;
 
-    public static int notificationID;
+    public static int intNotificationID;
     int intNotificationIDprefix = 0;
-    Cursor c;
-
-
-
+    Cursor curDisplayListings;
 
     String strIDlistings;
     String strNameListings;
     int intSelectedID;
 
-    //List<String> arrListings = new ArrayList<String>();
-
     ArrayList arrListings = new ArrayList<>();
 
-    TextView textAirFreq;
+    TextView texAirFreq;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.modifypage);
 
-        editName=(EditText)findViewById(R.id.editText);
-        editSeason=(EditText)findViewById(R.id.editText2);
-        editNumberEpisodes=(EditText)findViewById(R.id.editText3);
-        editCurrentEpisode=(EditText)findViewById(R.id.editText4);
-        editAirTime=(EditText)findViewById(R.id.editText5);
-        editAirDate=(EditText)findViewById(R.id.editText6);
+        edtNameField =(EditText)findViewById(R.id.editText);
+        edtSeasonField =(EditText)findViewById(R.id.editText2);
+        edtNumberEpisodesField =(EditText)findViewById(R.id.editText3);
+        edtCurrentEpisodeField =(EditText)findViewById(R.id.editText4);
+        edtAirTimeField =(EditText)findViewById(R.id.editText5);
+        edtDateField =(EditText)findViewById(R.id.editText6);
         radioGroupMain = (RadioGroup) findViewById(R.id.radioGroup);
-        saveListing = (Button) findViewById(R.id.button3);
-        textAirFreq = (TextView) findViewById(R.id.editText5);
+        btnSaveListing = (Button) findViewById(R.id.button3);
+        texAirFreq = (TextView) findViewById(R.id.editText5);
 
 
 
-        db = openOrCreateDatabase("newTVDB", Context.MODE_PRIVATE, null);
-        db.execSQL("CREATE TABLE IF NOT EXISTS Shows(id VARCHAR,name VARCHAR,seasonno VARCHAR,noepisodes VARCHAR,curepisode VARCHAR,airtime VARCHAR, airdate VARCHAR, airfreq VARCHAR);");
+        sqlTVListings = openOrCreateDatabase("newTVDB", Context.MODE_PRIVATE, null);
+        sqlTVListings.execSQL("CREATE TABLE IF NOT EXISTS Shows(id VARCHAR,name VARCHAR,seasonno VARCHAR,noepisodes VARCHAR,curepisode VARCHAR,airtime VARCHAR, airdate VARCHAR, airfreq VARCHAR);");
 
-        lv = (ListView) findViewById(R.id.listView2);
+        lisMain = (ListView) findViewById(R.id.listView2);
 
         displayList();
 
@@ -125,23 +109,23 @@ public class ModifyPage extends AppCompatActivity {
             }
         };
 
-        lv.setAdapter(arrayAdapter);
+        lisMain.setAdapter(arrayAdapter);
 
     }
 
     public void displayList(){
 
         SharedPreferences pref = this.getSharedPreferences("Share", Context.MODE_PRIVATE);
-        int orderFashion = pref.getInt("your key1", 0); //1 is default value.
-        System.out.println(orderFashion);
-        if(orderFashion==2){
-            c = db.rawQuery("SELECT * FROM Shows ORDER BY name COLLATE NOCASE;", null);
-        } else{
-            c=db.rawQuery("SELECT * FROM Shows", null);
+        int intOrderFashion = pref.getInt("your key1", 0); //comes from radio button in settings activity
+        System.out.println(intOrderFashion);
+        if(intOrderFashion==2){ //sorts by name
+            curDisplayListings = sqlTVListings.rawQuery("SELECT * FROM Shows ORDER BY name COLLATE NOCASE;", null);
+        } else{ //sorts by ID
+            curDisplayListings = sqlTVListings.rawQuery("SELECT * FROM Shows", null);
         }
 
 
-        if(c.getCount()==0)
+        if(curDisplayListings.getCount()==0)
         {
             showMessage("Error", "No Listings Found");
             return;
@@ -149,41 +133,38 @@ public class ModifyPage extends AppCompatActivity {
 
 
 
-        while(c.moveToNext())
+        while(curDisplayListings.moveToNext())
         {
-            StringBuffer buffer = new StringBuffer();
+            StringBuffer bufAllListings = new StringBuffer();
 
-            buffer.append("ID: " + c.getString(0)+"             ");
-            buffer.append("Name: "+c.getString(1)+"\n");
+            bufAllListings.append("ID: " + curDisplayListings.getString(0)+"             ");
+            bufAllListings.append("Name: "+ curDisplayListings.getString(1)+"\n");
 
 
-            arrListings.add(buffer.toString());
+            arrListings.add(bufAllListings.toString());
 
         }
 
 
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        lisMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView parent, View v, int position, long id){
 
-                String s = lv.getItemAtPosition(position).toString();
-                String a = lv.getItemAtPosition(position).toString();
+                String strBefore = lisMain.getItemAtPosition(position).toString();
+                String strAfter = lisMain.getItemAtPosition(position).toString();
 
-                s = s.substring(s.indexOf("ID: ") + 4);
-                s = s.substring(0, s.indexOf("             "));
+                //used to find the ID in a list view
+                strBefore = strBefore.substring(strBefore.indexOf("ID: ") + 4);
+                strBefore = strBefore.substring(0, strBefore.indexOf("             "));
 
-                a = a.substring(s.indexOf("Name: ") + 6);
-                a = a.substring(s.indexOf("             ") + 20);
+                //used to find the name in a list view
+                strAfter = strAfter.substring(strBefore.indexOf("Name: ") + 6);
+                strAfter = strAfter.substring(strBefore.indexOf("             ") + 20);
 
-
-                strIDlistings = s;
-                strNameListings = a;
-
-
-                System.out.println(s);
-
+                //sets into variable
+                strIDlistings = strBefore;
+                strNameListings = strAfter;
 
                 showPopup("Select Option" ,"Selected Show: " + strNameListings, strIDlistings);
-
 
             }
         });
@@ -191,13 +172,14 @@ public class ModifyPage extends AppCompatActivity {
 
     }
 
-    public void showPopup(String title, String message, String listingID) {
+    public void showPopup(String strTitle, String strMessage, String strListingID) {
+        //used to pop up a dialog allowing the user to modify, delete, or cancel out of a listing
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        intSelectedID = Integer.parseInt(listingID);
-        builder.setTitle(title);
+        intSelectedID = Integer.parseInt(strListingID);
+        builder.setTitle(strTitle);
 
-        builder.setMessage(message);
+        builder.setMessage(strMessage);
 
         builder.setPositiveButton("Modify",
                 new DialogInterface.OnClickListener() {
@@ -232,61 +214,53 @@ public class ModifyPage extends AppCompatActivity {
         builder.setTitle(title);
         builder.setMessage(message);
         builder.show();
-
-
-
     }
 
     public void displayID(int id){
 
-        Cursor c=db.rawQuery("SELECT * FROM Shows WHERE id='"+id+"'", null);
-        if(c.getCount()==0)
+        Cursor curSelectedID= sqlTVListings.rawQuery("SELECT * FROM Shows WHERE id='"+id+"'", null);
+        if(curSelectedID.getCount()==0)
         {
             showMessage("Error", "Please enter a valid ID");
             return;
         }
-        while(c.moveToNext())
+        while(curSelectedID.moveToNext())
         {
-            editName.setText(c.getString(1));
-            editSeason.setText(c.getString(2));
-            editNumberEpisodes.setText(c.getString(3));
-            editCurrentEpisode.setText(c.getString(4));
-            editAirTime.setText(c.getString(5));
-            editAirDate.setText(c.getString(6).substring(4,10) + "20" + c.getString(6).substring(10,12));
-            if(c.getString(7).equals("Daily")){
+            edtNameField.setText(curSelectedID.getString(1));
+            edtSeasonField.setText(curSelectedID.getString(2));
+            edtNumberEpisodesField.setText(curSelectedID.getString(3));
+            edtCurrentEpisodeField.setText(curSelectedID.getString(4));
+            edtAirTimeField.setText(curSelectedID.getString(5));
+            edtDateField.setText(curSelectedID.getString(6).substring(4,10) + "20" + curSelectedID.getString(6).substring(10,12));
+            if(curSelectedID.getString(7).equals("Daily")){
                 radioGroupMain.check(R.id.option1);
             }
-            if(c.getString(7).equals("Weekly")){
+            if(curSelectedID.getString(7).equals("Weekly")){
                 radioGroupMain.check(R.id.option1a);
             }
-            if(c.getString(7).equals("Monthly")){
+            if(curSelectedID.getString(7).equals("Monthly")){
                 radioGroupMain.check(R.id.option1b);
             }
 
 
         }
 
-        editName.setVisibility(View.VISIBLE);
-        editSeason.setVisibility(View.VISIBLE);
-        editNumberEpisodes.setVisibility(View.VISIBLE);
-        editCurrentEpisode.setVisibility(View.VISIBLE);
-        editAirTime.setVisibility(View.VISIBLE);
-        editAirDate.setVisibility(View.VISIBLE);
+        edtNameField.setVisibility(View.VISIBLE);
+        edtSeasonField.setVisibility(View.VISIBLE);
+        edtNumberEpisodesField.setVisibility(View.VISIBLE);
+        edtCurrentEpisodeField.setVisibility(View.VISIBLE);
+        edtAirTimeField.setVisibility(View.VISIBLE);
+        edtDateField.setVisibility(View.VISIBLE);
         radioGroupMain.setVisibility(View.VISIBLE);
-        saveListing.setVisibility(View.VISIBLE);
-        textAirFreq.setVisibility(View.VISIBLE);
+        btnSaveListing.setVisibility(View.VISIBLE);
+        texAirFreq.setVisibility(View.VISIBLE);
 
-        lv.setVisibility(View.INVISIBLE);
+        lisMain.setVisibility(View.INVISIBLE);
 
     }
 
     public void deleteID(int id){
-
-        db.execSQL("DELETE FROM Shows WHERE id='"+id+"'");
-
-
-
-
+        sqlTVListings.execSQL("DELETE FROM Shows WHERE id='"+id+"'");
     }
 
     public void gotoAdd(View view){
@@ -319,177 +293,169 @@ public class ModifyPage extends AppCompatActivity {
         radioGroupMain = (RadioGroup) findViewById(R.id.radioGroup);
 
         // get selected radio button from radioGroup
-        int selectedId = radioGroupMain.getCheckedRadioButtonId();
+        int intSelectedID = radioGroupMain.getCheckedRadioButtonId();
 
         // find the radiobutton by returned id
-        radioSelected = (RadioButton) findViewById(selectedId);
+        radSelected = (RadioButton) findViewById(intSelectedID);
 
     }
 
     public void timePick(View view){
-
-
         //inits current time (UF)
-        Calendar mcurrentTime = Calendar.getInstance();
-        int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-        int minute = mcurrentTime.get(Calendar.MINUTE);
+        Calendar calCurrentTime = Calendar.getInstance();
+        int intHour = calCurrentTime.get(Calendar.HOUR_OF_DAY);
+        int intMinute = calCurrentTime.get(Calendar.MINUTE);
 
-        TimePickerDialog mTimePicker;
-        mTimePicker = new TimePickerDialog(ModifyPage.this, new TimePickerDialog.OnTimeSetListener() {
+        TimePickerDialog tpdTimePicker;
+        tpdTimePicker = new TimePickerDialog(ModifyPage.this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                editAirTime.setText( selectedHour + ":" + selectedMinute);
+                edtAirTimeField.setText( selectedHour + ":" + selectedMinute);
             }
-        }, hour, minute, true);
-        mTimePicker.setTitle("Select airtime");
-        mTimePicker.show();
-
+        }, intHour, intMinute, true);
+        tpdTimePicker.setTitle("Select airtime");
+        tpdTimePicker.show();
     }
 
     public void datePick(View view){
 
-        //finds the current date to make more user friendly
-        Calendar mcurrentDate=Calendar.getInstance();
-        mYear=mcurrentDate.get(Calendar.YEAR);
-        mMonth=mcurrentDate.get(Calendar.MONTH);
-        mDay=mcurrentDate.get(Calendar.DAY_OF_MONTH);
+        //finds the current datMain to make more user friendly
+        Calendar calCurrentDate=Calendar.getInstance();
+        intYear =calCurrentDate.get(Calendar.YEAR);
+        intMonth =calCurrentDate.get(Calendar.MONTH);
+        intDay =calCurrentDate.get(Calendar.DAY_OF_MONTH);
 
         //inits dialog popup
-        DatePickerDialog mDatePicker=new DatePickerDialog(ModifyPage.this, new DatePickerDialog.OnDateSetListener() {
+        DatePickerDialog dpdDatePicker=new DatePickerDialog(ModifyPage.this, new DatePickerDialog.OnDateSetListener() {
             public void onDateSet(DatePicker datepicker, int selectedyear, int selectedmonth, int selectedday) {
-                editAirDate.setText(selectedday + "/" + (selectedmonth+1) + "/" + selectedyear); //sets edittext (userfriendly)
+                edtDateField.setText(selectedday + "/" + (selectedmonth+1) + "/" + selectedyear); //sets edittext (userfriendly)
             }
-        },mYear, mMonth, mDay);
-        mDatePicker.setTitle("Select airdate");
-        mDatePicker.show();  }
+        }, intYear, intMonth, intDay);
+        dpdDatePicker.setTitle("Select airdate");
+        dpdDatePicker.show();  }
 
-    private void scheduleNotification(Notification notification, long delay) {
+    private void scheduleNotification(Notification notMain, long lngDelay) {
 
-        Intent notificationIntent = new Intent(this, Receiver.class); //creates the intent for the receiver class
-        notificationIntent.putExtra(Receiver.NOTIFICATION, notification); //puts the actual notification
+        Intent intentNotification = new Intent(this, Receiver.class); //creates the intent for the receiver class
+        intentNotification.putExtra(Receiver.NOTIFICATION, notMain); //puts the actual notification
 
-        notificationID = intNotificationIDprefix;
-        System.out.println(notificationID);
+        intNotificationID = intNotificationIDprefix;
 
         //creates the pending intent to delay the notification, stores the unique id (a - random int), the notification Intent, and itself
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent intentPending = PendingIntent.getBroadcast(this, intNotificationID, intentNotification, PendingIntent.FLAG_UPDATE_CURRENT);
 
         //the android alarm works of the systemclock elapsed time, the amount of millis since boot. the delay variable (generated when the save button is clicked) is added to allow the alarm to determine the system clock time to pend the alarm to
-        long futureInMillis = SystemClock.elapsedRealtime() + delay;
-        System.out.println("SYSTEM TIME WHEN ALARM FINISHES : " + futureInMillis);
+        long lngFutureInMillis = SystemClock.elapsedRealtime() + lngDelay;
+        System.out.println("SYSTEM TIME WHEN ALARM FINISHES : " + lngFutureInMillis);
 
         //sets the alarm to the correct time, and tells it to use the pendingIntent when awoken, which invokes the reciever class...
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pendingIntent);
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, lngFutureInMillis, intentPending);
 
     }
 
-    private Notification getNotification(String content) {
+    private Notification getNotification(String strContent) {
         Notification.Builder builder = new Notification.Builder(this);
         builder.setContentTitle("Scheduled Notification");
-        builder.setContentText(content);
+        builder.setContentText(strContent);
         builder.setSmallIcon(R.drawable.logo);
         return builder.build();
     }
 
     public void finish(View view) throws Exception{
 
+        //sets ID to existing ID, instead of creating new
         id = intSelectedID;
         System.out.println("VARIABLE: id - " + id);
         addListenerOnButton();
 
         try{
-            Integer.parseInt(editNumberEpisodes.getText().toString());
-            Integer.parseInt(editCurrentEpisode.getText().toString());
-            Integer.parseInt(editSeason.getText().toString());
+            Integer.parseInt(edtNumberEpisodesField.getText().toString());
+            Integer.parseInt(edtCurrentEpisodeField.getText().toString());
+            Integer.parseInt(edtSeasonField.getText().toString());
         }catch (NumberFormatException e){
             showMessage("Error", "Please ensure correct data has been filled out for each field");
             return;
         }
 
-        if (editName.getText().toString().equals("") || editSeason.getText().toString().equals("") || editNumberEpisodes.getText().toString().equals("") || editCurrentEpisode.getText().toString().equals("") || editAirTime.getText().toString().equals("") || editAirDate.getText().toString().equals("")) {
+        if (edtNameField.getText().toString().equals("") || edtSeasonField.getText().toString().equals("") || edtNumberEpisodesField.getText().toString().equals("") || edtCurrentEpisodeField.getText().toString().equals("") || edtAirTimeField.getText().toString().equals("") || edtDateField.getText().toString().equals("")) {
             showMessage("Error", "Please ensure all fields are correctly filled out.");
-        }else if( Integer.parseInt(editNumberEpisodes.getText().toString()) < Integer.parseInt(editCurrentEpisode.getText().toString())){
+        }else if( Integer.parseInt(edtNumberEpisodesField.getText().toString()) < Integer.parseInt(edtCurrentEpisodeField.getText().toString())){
             showMessage("Error", "The current episode in the season cannot be larger than the total number of episodes in the season.");
-        }else if( Integer.parseInt(editSeason.getText().toString()) > 1000){
+        }else if( Integer.parseInt(edtSeasonField.getText().toString()) > 1000){
             showMessage("Error", "Season number must be between 1-1000");
-        }else if( Integer.parseInt(editSeason.getText().toString()) < 0 ){
+        }else if( Integer.parseInt(edtSeasonField.getText().toString()) < 0 ){
             showMessage("Error", "Season Number must be a number between 1-1000");
-        }else if( Integer.parseInt(editNumberEpisodes.getText().toString()) < 0 || Integer.parseInt(editNumberEpisodes.getText().toString()) > 100 ){
+        }else if( Integer.parseInt(edtNumberEpisodesField.getText().toString()) < 0 || Integer.parseInt(edtNumberEpisodesField.getText().toString()) > 100 ){
             showMessage("Error", "Total Episodes must be a number between 1-100");
-        }else if( Integer.parseInt(editCurrentEpisode.getText().toString()) < 0 || Integer.parseInt(editCurrentEpisode.getText().toString()) > 100 ){
+        }else if( Integer.parseInt(edtCurrentEpisodeField.getText().toString()) < 0 || Integer.parseInt(edtCurrentEpisodeField.getText().toString()) > 100 ){
             showMessage("Error", "Current episode must be a number between 1-100");
         }else {
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy hh:mm");
-            String mm = editAirDate.getText().toString() + " " + editAirTime.getText().toString();
-            System.out.println(mm);
-            Date date = sdf.parse(mm);
+            String strDateFromFields = edtDateField.getText().toString() + " " + edtAirTimeField.getText().toString();
+            System.out.println(strDateFromFields);
+            Date datMain = sdf.parse(strDateFromFields);
             long lngCurrentTime = System.currentTimeMillis();
-            System.out.println("CURRENT TIME " + lngCurrentTime);
 
-            String meme = "";
-            int intTotalEpisodes = Integer.parseInt(editNumberEpisodes.getText().toString()) - Integer.parseInt(editCurrentEpisode.getText().toString());
-            System.out.println("INTTOTALEPISODES" + intTotalEpisodes);
-            System.out.println("Date - Time in milliseconds : " + date.getTime());
-            long longTimeUntil = date.getTime();
+            String strFinalDate = "";
+            int intTotalEpisodes = Integer.parseInt(edtNumberEpisodesField.getText().toString()) - Integer.parseInt(edtCurrentEpisodeField.getText().toString());
+            long longTimeUntil = datMain.getTime();
 
             long lngTimeUntilAir = longTimeUntil - lngCurrentTime;
 
             Calendar cal = Calendar.getInstance();
-            Date currentDate = cal.getTime();
+            Date datCurrent = cal.getTime();
             String strNotificationIDprefix;
 
 
-            if (currentDate.after(date)) {
-                showMessage("Error", "Please select a future date for scheduling TV Listings");
+            if (datCurrent.after(datMain)) {
+                showMessage("Error", "Please select a future datMain for scheduling TV Listings");
             } else {
 
-                System.out.println("TIME UNTIL " + lngTimeUntilAir);
-
-                if (radioSelected.getText().equals("Daily")) {
+                if (radSelected.getText().equals("Daily")) {
 
                     int f;
                     for (f = 0; f < (intTotalEpisodes + 1); f++) {
                         strNotificationIDprefix = "" + id + "00";
                         intNotificationIDprefix = Integer.parseInt(strNotificationIDprefix);
                         intNotificationIDprefix = intNotificationIDprefix + f;
-                        scheduleNotification(getNotification(editName.getText().toString()), (lngTimeUntilAir + (86400000 * f)));
+                        scheduleNotification(getNotification(edtNameField.getText().toString()), (lngTimeUntilAir + (86400000 * f)));
                         System.out.println("TIME UNTIL THE NOTIFICATION FOR DAY " + f + " : " + (lngTimeUntilAir + (86400000 * f)));
                     }
 
-                    StringBuffer buffer2 = new StringBuffer();
+                    StringBuffer bufDates = new StringBuffer();
 
 
-                    Date date2 = sdf.parse(mm);
-                    Date temp = date2;
+                    Date datParsed = sdf.parse(strDateFromFields);
+                    Date datTemp = datParsed;
 
-                    buffer2.append(" ");
+                    bufDates.append(" ");
 
                     for (int fg = 0; fg < (intTotalEpisodes + 1); fg++) {
 
-                        String newstring = new SimpleDateFormat("dd/MM/yy HH:mm").format(temp);
+                        String strFormattedDate = new SimpleDateFormat("dd/MM/yy HH:mm").format(datTemp);
 
-                        buffer2.append(fg + ": " + newstring + " ");
+                        bufDates.append(fg + ": " + strFormattedDate + " ");
 
-                        int noOfDays = 7; //i.e two weeks
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTime(temp);
-                        calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
+                        int intNumberDays = 7;
+                        Calendar calFutureDate = Calendar.getInstance();
+                        calFutureDate.setTime(datTemp);
+                        calFutureDate.add(Calendar.DAY_OF_YEAR, intNumberDays);
 
-                        Date nextDate = calendar.getTime();
+                        Date datNext = calFutureDate.getTime();
 
-                        temp = nextDate;
+                        datTemp = datNext;
                     }
 
-                    meme = buffer2.toString();
-                    System.out.println(meme);
+                    strFinalDate = bufDates.toString();
+                    System.out.println(strFinalDate);
                 }
 
                 long lngFinalAirTime;
                 long lngBigMillis;
 
-                if (radioSelected.getText().equals("Weekly")) {
+                if (radSelected.getText().equals("Weekly")) {
                     int f;
                     for (f = 0; f < (intTotalEpisodes + 1); f++) {
                         strNotificationIDprefix = "" + id + "00";
@@ -499,77 +465,77 @@ public class ModifyPage extends AppCompatActivity {
                         lngBigMillis = Long.valueOf(86400000 * f);
                         System.out.println(lngBigMillis);
                         lngFinalAirTime = lngFinalAirTime + lngBigMillis;
-                        scheduleNotification(getNotification(editName.getText().toString()), lngFinalAirTime);
+                        scheduleNotification(getNotification(edtNameField.getText().toString()), lngFinalAirTime);
                         System.out.println("TIME UNTIL THE NOTIFICATION FOR WEEK " + f + " : " + (lngFinalAirTime));
                         System.out.println(f);
                     }
 
-                    StringBuffer buffer2 = new StringBuffer();
+                    StringBuffer bufDates = new StringBuffer();
 
 
-                    Date date2 = sdf.parse(mm);
-                    Date temp = date2;
-                    buffer2.append(" ");
+                    Date datParsed = sdf.parse(strDateFromFields);
+                    Date datTemp = datParsed;
+                    bufDates.append(" ");
 
 
                     for (int fg = 0; fg < (intTotalEpisodes + 1); fg++) {
 
-                        String newstring = new SimpleDateFormat("dd/MM/yy HH:mm").format(temp);
+                        String strFormattedDate = new SimpleDateFormat("dd/MM/yy HH:mm").format(datTemp);
 
-                        buffer2.append(fg + ": " + newstring + " ");
+                        bufDates.append(fg + ": " + strFormattedDate + " ");
 
-                        int noOfDays = 7; //i.e two weeks
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTime(temp);
-                        calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
+                        int intNumberDays = 7; //i.e two weeks
+                        Calendar calFutureDate = Calendar.getInstance();
+                        calFutureDate.setTime(datTemp);
+                        calFutureDate.add(Calendar.DAY_OF_YEAR, intNumberDays);
 
-                        Date nextDate = calendar.getTime();
+                        Date datNext = calFutureDate.getTime();
 
-                        temp = nextDate;
+                        datTemp = datNext;
                     }
 
-                    meme = buffer2.toString();
-                    System.out.println(meme);
+                    strFinalDate = bufDates.toString();
+                    System.out.println(strFinalDate);
 
                 }
 
 
-                Cursor c = db.rawQuery("SELECT * FROM Shows WHERE id='" + intSelectedID + "'", null);
-                if (c.moveToFirst()) {
+                Cursor curCurrentListing = sqlTVListings.rawQuery("SELECT * FROM Shows WHERE id='" + intSelectedID + "'", null);
+                if (curCurrentListing.moveToFirst()) {
 
-                    db.execSQL("UPDATE Shows SET name='"
-                            + editName.getText()
+                    sqlTVListings.execSQL("UPDATE Shows SET name='"
+                            + edtNameField.getText()
                             + "',seasonno='"
-                            + editSeason.getText()
+                            + edtSeasonField.getText()
                             + "',noepisodes='"
-                            + editNumberEpisodes.getText()
+                            + edtNumberEpisodesField.getText()
                             + "',curepisode='"
-                            + editCurrentEpisode.getText()
+                            + edtCurrentEpisodeField.getText()
                             + "',airtime='"
-                            + editAirTime.getText()
+                            + edtAirTimeField.getText()
                             + "',airdate='"
-                            + meme
+                            + strFinalDate
                             + "',airfreq='"
-                            + radioSelected.getText()
+                            + radSelected.getText()
                             +
                             "' WHERE id='" + intSelectedID + "'");
                 }
 
-                StringBuffer buffer = new StringBuffer();
-                Cursor d = db.rawQuery("SELECT * FROM Shows WHERE name='" + editName.getText() + "'", null);
+                StringBuffer bufCurrentListing = new StringBuffer();
+                Cursor d = sqlTVListings.rawQuery("SELECT * FROM Shows WHERE name='" + edtNameField.getText() + "'", null);
 
                 while (d.moveToNext()) {
 
-                    buffer.append("ID: " + d.getString(0) + "\n");
-                    buffer.append("Name: " + d.getString(1) + "\n");
-                    buffer.append("Season Number: " + d.getString(2) + "\n");
-                    buffer.append("Number of Episodes: " + d.getString(3) + "\n");
-                    buffer.append("Current Episode: " + d.getString(4) + "\n");
-                    buffer.append("Air Time: " + d.getString(5) + "\n");
-                    buffer.append("Next Episode Airs: " + (d.getString(6).substring(4, 10) + "20" + d.getString(6).substring(10, 12) + "\n"));
-                    buffer.append("Air Freq: " + d.getString(7) + "\n\n");
+                    bufCurrentListing.append("ID: " + d.getString(0) + "\n");
+                    bufCurrentListing.append("Name: " + d.getString(1) + "\n");
+                    bufCurrentListing.append("Season Number: " + d.getString(2) + "\n");
+                    bufCurrentListing.append("Number of Episodes: " + d.getString(3) + "\n");
+                    bufCurrentListing.append("Current Episode: " + d.getString(4) + "\n");
+                    bufCurrentListing.append("Air Time: " + d.getString(5) + "\n");
+                    bufCurrentListing.append("Next Episode Airs: " + (d.getString(6).substring(4, 10) + "20" + d.getString(6).substring(10, 12) + "\n"));
+                    bufCurrentListing.append("Air Freq: " + d.getString(7) + "\n\n");
 
-                    showMessage("Listing Details", buffer.toString());
+                    showMessage("Listing Details", bufCurrentListing.toString());
 
                 }
 
