@@ -25,7 +25,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-
+/*
+The purpose of this class is to display upcoming episodes for the added TV Listings. It also downloads
+metadata for each listing if available
+ */
 public class UpcomingPage extends AppCompatActivity {
 
     ListView lstMain;
@@ -347,6 +350,7 @@ public class UpcomingPage extends AppCompatActivity {
 
 
 
+    //intent buttons
     public void gotoAdd(View view){
         Intent i = new Intent(view.getContext(),AddPage.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

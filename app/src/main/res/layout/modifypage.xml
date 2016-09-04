@@ -194,7 +194,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/option1"
             android:text="Daily"
-            android:checked="true"
             android:layout_below="@+id/option1b"
             android:layout_alignStart="@+id/option1b"
             />
@@ -206,7 +205,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/option1b"
             android:text="Weekly"
-            android:checked="false"
             android:layout_below="@+id/option1a"
             android:layout_alignRight="@+id/imageView" />
 

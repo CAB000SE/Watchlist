@@ -10,7 +10,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-
+/*
+allows the user to change the sorting order, as well as erase all listings.
+ */
 public class SettingsPage extends AppCompatActivity {
 
     SQLiteDatabase sqlTVListings;
@@ -23,19 +25,20 @@ public class SettingsPage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        //gets the order fashion (if exists)
         SharedPreferences pref = this.getSharedPreferences("Share", Context.MODE_PRIVATE);
-        int intOrderFashion = pref.getInt("your key1", 0); //1 is default value.
+        int intOrderFashion = pref.getInt("your key1", 0);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settingspage);
 
         sqlTVListings = openOrCreateDatabase("newTVDB", Context.MODE_PRIVATE, null);
 
-        addListenerOnButton();
+        addListenerOnButton(); //listens to a change in radio button
 
-        if(intOrderFashion==2){
+        if(intOrderFashion==2){ //if the radio button has already been changed
             radioGroupMain.check(R.id.orderName);
-        }else{
+        }else{ //if it hasnt, default at sort by ID
             radioGroupMain.check(R.id.orderID);
         }
 
@@ -62,11 +65,11 @@ public class SettingsPage extends AppCompatActivity {
         // find the radiobutton by returned id
         radSelected = (RadioButton) findViewById(selectedId);
 
-        if(radSelected.getText().equals("Order By ID")){
+        if(radSelected.getText().equals("Order By ID")){ //if the radio button is ID
             orderID();
         }
 
-        if(radSelected.getText().equals("Order By Name")){
+        if(radSelected.getText().equals("Order By Name")){ //if the radio button is Name
             orderName();
         }
 
@@ -75,31 +78,31 @@ public class SettingsPage extends AppCompatActivity {
 
     public void orderName(){
 
+        //orders listings by name
         SharedPreferences pref = this.getSharedPreferences("Share", Context.MODE_PRIVATE);
         int orderFashion;
 
-        orderFashion = 2;
+        orderFashion = 2; //sets the orderFashion as 2. This is used in the modify listing / upcoming class.
 
         SharedPreferences.Editor edit = pref.edit();
         edit.putInt("your key1", orderFashion);
         edit.commit();
 
-        System.out.println("yes im here");
 
     }
 
     public void orderID(){
+        //orders listings by ID
 
         SharedPreferences pref = this.getSharedPreferences("Share", Context.MODE_PRIVATE);
         int orderFashion;
 
-        orderFashion = 3;
+        orderFashion = 3; //sets the orderFashion as 3. This is used in the modify listing / upcoming class.
 
         SharedPreferences.Editor edit = pref.edit();
         edit.putInt("your key1", orderFashion);
         edit.commit();
 
-        System.out.println("yes im again");
 
     }
 
@@ -115,6 +118,7 @@ public class SettingsPage extends AppCompatActivity {
 
     }
 
+    //intent buttons
     public void gotoAdd(View view){
         Intent i = new Intent(view.getContext(),AddPage.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

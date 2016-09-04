@@ -5,6 +5,9 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+/*
+The purpose of this class is to handle notifications.
+ */
 
 public class Receiver extends BroadcastReceiver {
 
@@ -15,9 +18,10 @@ public class Receiver extends BroadcastReceiver {
         //opens the notification manager
         NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-
+        //gets the notification from class
         Notification notMain = intent.getParcelableExtra(NOTIFICATION);
 
+        //gets the notifications ID
         int intNotificationID = AddPage.intNotificationID;
 
         //finally uses the notification

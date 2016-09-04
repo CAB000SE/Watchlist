@@ -24,7 +24,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
-
+/*
+The purpose of this class is to add new TV Listings into the master database.
+ */
 public class AddPage extends AppCompatActivity {
 
     EditText edtNameField;
@@ -168,7 +170,7 @@ public class AddPage extends AppCompatActivity {
 
             intNotificationID = intNotificationIDprefix;
 
-            //creates the pending intent to delay the notification, stores the unique id , the notification Intent, and itself
+            //creates the pending intent to delay the notification, stores the unique id , the notification Intent
             PendingIntent intentPending = PendingIntent.getBroadcast(this, intNotificationID, intentNotification, PendingIntent.FLAG_UPDATE_CURRENT);
 
             //the android alarm works of the systemclock elapsed time, the amount of millis since boot. the delay variable (generated when the save button is clicked) is added to allow the alarm to determine the system clock time to pend the alarm to
@@ -250,7 +252,7 @@ public class AddPage extends AppCompatActivity {
             long lngTimeUntil = datMain.getTime();
             long lngTimeUntilAir = lngTimeUntil - lngCurrentTime;
 
-            //gets the current datMain to test below if
+            //gets the current date to test below if
             Calendar cal = Calendar.getInstance();
             Date datCurrent = cal.getTime();
             String strNotificationIDprefix;
@@ -258,7 +260,7 @@ public class AddPage extends AppCompatActivity {
 
             if (datCurrent.after(datMain)) { //test to ensure only future dates can be selected
                 showMessage("Error", "Please select a future datMain for scheduling TV Listings");
-            } else { //if it isnt a future datMain...
+            } else { //if it isnt a future date...
 
 
                 //uses the radio button to determine the air freq
@@ -266,7 +268,7 @@ public class AddPage extends AppCompatActivity {
 
                     int f;
                     for (f = 0; f < (intTotalEpisodes + 1); f++) { //invokes scheduleNotification the correct amount of episodes, multiplying the current episode by 24 hours (86400000 in millis) to schedule the correct number of notifications through the alarmmanager
-                        strNotificationIDprefix = "" + id + "00";
+                        strNotificationIDprefix = "" + id + "00"; //creates a unique ID for each air date
                         intNotificationIDprefix = Integer.parseInt(strNotificationIDprefix);
                         intNotificationIDprefix = intNotificationIDprefix + f;
                         scheduleNotification(getNotification(edtNameField.getText().toString()), (lngTimeUntilAir + (86400000 * f)));
@@ -275,6 +277,7 @@ public class AddPage extends AppCompatActivity {
                     StringBuffer bufDates = new StringBuffer();
 
 
+                    //gets parsed date
                     Date datParsed = sdf.parse(strDateFromFields);
                     Date datTemp = datParsed;
                     bufDates.append(" ");
@@ -282,21 +285,23 @@ public class AddPage extends AppCompatActivity {
                     //used for finding the future air dates for the listings BY DAY
                     for (int fg = 0; fg < (intTotalEpisodes + 1); fg++) {
 
+                        //formats date
                         String strFormattedDate = new SimpleDateFormat("dd/MM/yy HH:mm").format(datTemp);
 
+                        //adds the future dates into buffer
                         bufDates.append(fg + ": " + strFormattedDate + " ");
 
                         int intNumberDays = 1;
                         Calendar calFutureDate = Calendar.getInstance();
                         calFutureDate.setTime(datTemp);
-                        calFutureDate.add(Calendar.DAY_OF_YEAR, intNumberDays);
+                        calFutureDate.add(Calendar.DAY_OF_YEAR, intNumberDays); //adds 1 day to variable
 
                         Date datNext = calFutureDate.getTime();
 
-                        datTemp = datNext;
+                        datTemp = datNext; //puts the date into temp variable
                     }
 
-                    strFinalDate = bufDates.toString();
+                    strFinalDate = bufDates.toString(); //puts the final dates into string
                     System.out.println(strFinalDate);
                 }
 
@@ -309,7 +314,7 @@ public class AddPage extends AppCompatActivity {
                         strNotificationIDprefix = "" + id + "00";
                         intNotificationIDprefix = Integer.parseInt(strNotificationIDprefix);
                         intNotificationIDprefix = intNotificationIDprefix + f;
-                        lngFinalAirTime = lngTimeUntilAir;
+                        lngFinalAirTime = lngTimeUntilAir; //has to use longs due to massive numbers for a week in millis
                         lngBigMillis = Long.valueOf(86400000 * f);
                         System.out.println(lngBigMillis);
                         lngFinalAirTime = lngFinalAirTime + lngBigMillis;

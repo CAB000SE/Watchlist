@@ -11,7 +11,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.database.*;
-
+/*
+The main activity class. It serves no purpose other than a hub.
+ */
 public class MainActivity extends AppCompatActivity {
 
 
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.mainpage);
 
+        //creates database
         SQLiteDatabase sqlTVListings=openOrCreateDatabase("newTVDB", Context.MODE_PRIVATE, null);
         sqlTVListings.execSQL("CREATE TABLE IF NOT EXISTS Shows(id VARCHAR,name VARCHAR,seasonno VARCHAR,noepisodes VARCHAR,curepisode VARCHAR,airtime VARCHAR, airdate VARCHAR, airfreq VARCHAR);");
     }

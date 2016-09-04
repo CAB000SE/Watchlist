@@ -13,7 +13,9 @@ import android.widget.TextView;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
-
+/*
+The purpose of this class is to act as a custom listview for the UpcomingPage class.
+ */
 public class CustomListAdapter extends ArrayAdapter<String> {
 
     private final Activity context; //gets the current activity this class is in (UpcomingPage)
