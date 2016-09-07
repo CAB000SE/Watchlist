@@ -203,6 +203,7 @@ public class ModifyPage extends AppCompatActivity {
                         //if delete is selected, delete Listing with relevant ID
                         deleteID(intSelectedID);
 
+
                         //toast the process
                         Toast toast = Toast.makeText(getApplicationContext(), "Successfully deleted " + strNameListings + " from the database", Toast.LENGTH_LONG);
                         toast.show();
@@ -273,6 +274,12 @@ public class ModifyPage extends AppCompatActivity {
     public void deleteID(int id){
         //deletes from database where the ID equals the given ID
         sqlTVListings.execSQL("DELETE FROM Shows WHERE id='"+id+"'");
+        final Context context = this;
+
+        Intent i = new Intent(context,ModifyPage.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(i);
+
     }
 
 
@@ -566,7 +573,14 @@ public class ModifyPage extends AppCompatActivity {
 
                     showMessage("Listing Details", bufCurrentListing.toString());
 
+                    edtNameField.setText("");
+                    edtSeasonField.setText("");
+                    edtNumberEpisodesField.setText("");
+                    edtCurrentEpisodeField.setText("");
+                    edtAirTimeField.setText("");
+                    edtDateField.setText("");
                 }
+
 
             }
         }

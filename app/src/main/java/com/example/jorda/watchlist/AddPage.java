@@ -199,6 +199,12 @@ public class AddPage extends AppCompatActivity {
         //finds the selected airfreq radio button
         addListenerOnButton();
 
+        //used to test for a ' in the listing. it is not allowed in SQL
+        String strTestingFor = edtNameField.getText().toString();
+
+
+
+
         //below try is to determine if the integer fields are actually integers before continuing. Catches strings, longs, floats
         try{
             Integer.parseInt(edtNumberEpisodesField.getText().toString());
@@ -222,7 +228,9 @@ public class AddPage extends AppCompatActivity {
             showMessage("Error", "Total Episodes must be a number between 1-100");
         }else if( Integer.parseInt(edtCurrentEpisodeField.getText().toString()) < 0 || Integer.parseInt(edtCurrentEpisodeField.getText().toString()) > 100 ){
             showMessage("Error", "Current episode must be a number between 1-100");
-        }else { //end data validation
+        }else if(strTestingFor.contains("'")){
+            showMessage("Error", "Please remove any instance of ' in your listing name");
+        } else{ //end data validation
 
             //gets the current count variable stored within the application, which keeps the running id to keep each listing unique for the sqlite database
             SharedPreferences shpMain = this.getSharedPreferences("Share", Context.MODE_PRIVATE);
@@ -398,6 +406,14 @@ public class AddPage extends AppCompatActivity {
                     bufCurrentListing.append("Air Freq: " + curAllListings.getString(7) + "\n\n");
                 }
                 showMessage("Listing Details", bufCurrentListing.toString());
+
+                edtNameField.setText("");
+                edtSeasonField.setText("");
+                edtNumberEpisodesField.setText("");
+                edtCurrentEpisodeField.setText("");
+                edtAirTimeField.setText("");
+                edtAirDateField.setText("");
+
 
             }
 
