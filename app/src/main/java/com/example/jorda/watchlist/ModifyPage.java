@@ -1,5 +1,6 @@
 package com.example.jorda.watchlist;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.Notification;
@@ -9,10 +10,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -297,10 +300,31 @@ public class ModifyPage extends AppCompatActivity {
     }
 
     public void gotoUpcoming(View view){
+        //checks if has correct permissions
+        final Context context = this;
+        PackageManager pm = context.getPackageManager();
+        int hasPerm = pm.checkPermission(
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                context.getPackageName());
+        if (hasPerm != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions();
+        }else{
+            Intent i = new Intent(view.getContext(),UpcomingPage.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivity(i);
+        }
+    }
+    public void requestPermissions(){ //requests permissions to read and write
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            final String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
+            ActivityCompat.requestPermissions(this, permissions, 0);
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            ActivityCompat.requestPermissions(this, permissions, 0);
+        }
 
-        Intent i = new Intent(view.getContext(),UpcomingPage.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(i);
+
     }
 
     public void gotoSettings(View view){
